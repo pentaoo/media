@@ -7,10 +7,10 @@ const intro = document.querySelector('#intro');
 const content = document.querySelector('#intro-content');
 const skip = document.querySelector('#intro-skip');
 const continueButton = document.querySelector('#intro-continue');
-const copyButton = document.querySelector('#intro-copy');
 const copyStatus = document.querySelector('#intro-copy-status');
 const headline = document.querySelector('#intro-headline');
 const linkWrap = document.querySelector('#intro-link-wrap');
+const siteLink = linkWrap.querySelector('.intro__site-link');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 const headlineParts = [...headline.querySelectorAll('.intro__faded, .intro__site-link')];
 const pageBelow = [document.querySelector('.site-header'), document.querySelector('#app'), document.querySelector('#player')];
@@ -63,9 +63,7 @@ function updateHeadlineHover(event) {
     pointerMoved ||= Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 6;
   }
   const overText = isOverText(event);
-  const linkRect = linkWrap.getBoundingClientRect();
-  const linkPadding = Math.min(80, Math.max(24, linkRect.height * 0.45));
-  headlineHovered = overText || containsPoint(linkRect, event.clientX, event.clientY, linkPadding);
+  headlineHovered = overText;
   intro.classList.toggle('is-copy-hovered', finePointer.matches && overText && !pointerStart);
   setLinkActive();
 }
@@ -107,7 +105,11 @@ skip.addEventListener('click', () => {
   reveal();
 });
 continueButton.addEventListener('click', dismissText);
-copyButton.addEventListener('click', copySiteUrl);
+siteLink.addEventListener('keydown', (event) => {
+  if (event.key !== ' ' || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  if (!event.repeat) copySiteUrl();
+});
 intro.addEventListener('pointermove', updateHeadlineHover);
 intro.addEventListener('pointerdown', (event) => {
   if (event.button !== 0 || event.pointerType === 'touch') return;
