@@ -20,9 +20,9 @@
       <div class="intro__sphere" id="intro-sphere" role="group" tabindex="0" aria-label="Видеосфера: перетаскивайте, чтобы осмотреться. Также работают стрелки на клавиатуре."></div>
       <div class="intro__shade" aria-hidden="true"></div>
       <p class="intro__hint" id="intro-hint" hidden>ТЯНИ, ЧТОБЫ ОСМОТРЕТЬСЯ <span aria-hidden="true">↔</span></p>
-      <button class="intro__skip" id="intro-skip" type="button">Показать текст <span aria-hidden="true">↗</span></button>
+      <button class="text-button text-button--compact intro__skip" id="intro-skip" type="button" aria-controls="intro-content" aria-expanded="false">Показать текст <span aria-hidden="true">↗</span></button>
       <div class="intro__content" id="intro-content" hidden>
-        <h1 class="intro__headline" id="intro-headline">
+        <h1 class="heading-1 intro__headline" id="intro-headline">
           <span class="intro__line"><span class="intro__faded">Скоро на</span></span>
           <span class="intro__line"><span class="intro__link-wrap" id="intro-link-wrap">
             <a class="intro__site-link" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer">chinatown.ru</a>
@@ -34,13 +34,14 @@
               <span class="intro__orbit intro__orbit--5"></span>
             </span>
             <button class="intro__copy" id="intro-copy" type="button" aria-label="Скопировать ссылку chinatown.ru" title="Скопировать ссылку"></button>
-          </span> <span class="intro__faded">можно</span></span>
-          <span class="intro__line"><span class="intro__faded">будет прочитать</span></span>
+          </span></span>
+          <span class="intro__line"><span class="intro__faded">можно будет</span></span>
+          <span class="intro__line"><span class="intro__faded">прочитать</span></span>
           <span class="intro__line"><span class="intro__faded">о нефорах</span></span>
         </h1>
         <div class="intro__bottom">
           <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
-          <button class="intro__continue" id="intro-continue" type="button"><span>ОКЕ</span><img src="./assets/icons/navigate-next-sharp.svg" alt="" aria-hidden="true" /></button>
+          <button class="text-button intro__continue" id="intro-continue" type="button"><span>ОКЕ</span><img src="./assets/icons/navigate-next-sharp.svg" alt="" aria-hidden="true" /></button>
         </div>
       </div>
     </section>
