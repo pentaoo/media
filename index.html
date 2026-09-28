@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111111" />
+    <title>Pocket Jam — музыка и сцена</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="catalog">
+    <section class="intro" id="intro" aria-label="Вступление Pocket Jam">
+      <div class="intro__wall" aria-hidden="true">
+        <img src="./assets/video/concert.jpg" alt="" />
+        <img src="./assets/video/dj.jpg" alt="" />
+        <img src="./assets/video/concert.jpg" alt="" />
+        <img src="./assets/video/moscow.jpg" alt="" />
+        <img src="./assets/video/concert.jpg" alt="" />
+        <img src="./assets/video/dj.jpg" alt="" />
+      </div>
+      <div class="intro__sphere" id="intro-sphere" role="group" tabindex="0" aria-label="Видеосфера: перетаскивайте, чтобы осмотреться. Также работают стрелки на клавиатуре."></div>
+      <div class="intro__shade" aria-hidden="true"></div>
+      <p class="intro__hint" id="intro-hint" hidden>ТЯНИ, ЧТОБЫ ОСМОТРЕТЬСЯ <span aria-hidden="true">↔</span></p>
+      <button class="intro__skip" id="intro-skip" type="button">Показать текст <span aria-hidden="true">↗</span></button>
+      <div class="intro__content" id="intro-content" hidden>
+        <h1 class="intro__headline" id="intro-headline">
+          <span class="intro__line"><span class="intro__faded">Скоро на</span></span>
+          <span class="intro__line"><span class="intro__link-wrap" id="intro-link-wrap">
+            <a class="intro__site-link" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer">chinatown.ru</a>
+            <span class="intro__orbit-track" aria-hidden="true">
+              <span class="intro__orbit intro__orbit--1"></span>
+              <span class="intro__orbit intro__orbit--2"></span>
+              <span class="intro__orbit intro__orbit--3"></span>
+              <span class="intro__orbit intro__orbit--4"></span>
+              <span class="intro__orbit intro__orbit--5"></span>
+            </span>
+            <button class="intro__copy" id="intro-copy" type="button" aria-label="Скопировать ссылку chinatown.ru" title="Скопировать ссылку"></button>
+          </span> <span class="intro__faded">можно</span></span>
+          <span class="intro__line"><span class="intro__faded">будет прочитать</span></span>
+          <span class="intro__line"><span class="intro__faded">о нефорах</span></span>
+        </h1>
+        <div class="intro__bottom">
+          <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
+          <button class="intro__continue" id="intro-continue" type="button"><span>ОКЕ</span><img src="./assets/icons/navigate-next-sharp.svg" alt="" aria-hidden="true" /></button>
+        </div>
+      </div>
+    </section>
+    <header class="site-header">
+      <a href="./" data-home-link>Pocket Jam</a>
+      <nav aria-label="Основная навигация"><a href="./new-sketch.html">Новый набросок ↗</a></nav>
+    </header>
+
+    <main id="app"></main>
+
+    <aside class="player" id="player" aria-label="Плеер Яндекс Музыки" hidden>
+      <div class="player__head">
+        <div class="player__identity">
+          <strong id="player-title"></strong>
+        </div>
+        <a id="player-external" class="player__external" target="_blank" rel="noopener noreferrer" aria-label="Открыть в Яндекс Музыке">
+          <span class="player__external-text">Открыть в Яндекс Музыке</span>
+        </a>
+        <button class="player__control" id="player-expand" type="button" aria-label="Развернуть плеер" aria-expanded="false">Развернуть</button>
+        <button class="player__control" id="player-close" type="button" aria-label="Закрыть плеер">Закрыть</button>
+      </div>
+      <div class="player__frame-wrap" id="player-frame-wrap"></div>
+      <p class="player__note">Если виджет не загрузился, проверьте сетевое подключение или откройте релиз по ссылке выше.</p>
+    </aside>
+
+    <script type="module" src="./src/app.js"></script>
+    <script type="module" src="./src/intro.js"></script>
+  </body>
+</html>

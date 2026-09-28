@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111111" />
+    <title>Новый набросок — Pocket Jam</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="sketch-page">
+    <header class="sketch-header">
+      <a href="./" class="sketch-header__brand">Pocket Jam</a>
+      <a href="./" class="sketch-header__back">← На главную</a>
+    </header>
+    <main class="sketch-layout">
+      <div class="sketch-intro">
+        <span class="sketch-eyebrow">Творческая лаборатория / 001</span>
+        <h1>Новый<br />набросок<span class="sketch-dot">.</span></h1>
+        <p>Зафиксируйте мысль, пока она звучит. Название, текст и ссылки на медиа сохраняются в этом браузере.</p>
+      </div>
+      <div class="sketch-workspace">
+        <form id="sketch-form" class="sketch-form">
+          <div class="sketch-form__top"><span>01 / Редактор</span><button type="button" id="sketch-new" class="sketch-text-button">Очистить и начать новый ↗</button></div>
+          <label for="sketch-title">Название</label>
+          <input id="sketch-title" name="title" type="text" maxlength="140" placeholder="Как назвать эту идею?" autocomplete="off" />
+          <label for="sketch-text">Текст</label>
+          <textarea id="sketch-text" name="text" rows="10" placeholder="Мысль, наблюдение, набросок истории…"></textarea>
+          <label for="sketch-media">Медиа <span>по одной ссылке в строке</span></label>
+          <textarea id="sketch-media" name="media" rows="4" placeholder="https://…"></textarea>
+          <p class="sketch-form__error" id="sketch-error" role="alert" hidden></p>
+          <div class="sketch-form__actions"><button class="sketch-save" type="submit">Сохранить набросок <span aria-hidden="true">↗</span></button><span id="sketch-status" role="status" aria-live="polite">Локальный черновик</span></div>
+        </form>
+        <section class="sketch-drafts" aria-labelledby="sketch-drafts-heading">
+          <div class="sketch-drafts__head"><h2 id="sketch-drafts-heading">Сохранённые наброски</h2><span id="sketch-count">00</span></div>
+          <div id="sketch-list" class="sketch-drafts__list"></div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="./src/new-sketch.js"></script>
+  </body>
+</html>
