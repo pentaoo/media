@@ -6,7 +6,6 @@ const SITE_URL = 'https://chinatown.ru';
 const intro = document.querySelector('#intro');
 const content = document.querySelector('#intro-content');
 const skip = document.querySelector('#intro-skip');
-const hint = document.querySelector('#intro-hint');
 const continueButton = document.querySelector('#intro-continue');
 const copyButton = document.querySelector('#intro-copy');
 const copyStatus = document.querySelector('#intro-copy-status');
@@ -39,7 +38,6 @@ function dismissText() {
   skip.hidden = false;
   skip.setAttribute('aria-expanded', 'false');
   intro.classList.remove('intro--revealed');
-  hint.hidden = !intro.classList.contains('intro--sphere-ready');
   headlineHovered = false;
   linkFocused = false;
   pointerStart = null;

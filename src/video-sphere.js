@@ -80,6 +80,7 @@ const FRAGMENT_SHADER = [
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const MAX_PITCH = Math.PI / 3;
 const DRAG_RADIANS_PER_PIXEL = 0.0042;
+const AUTO_ROTATION_RADIANS_PER_SECOND = 0.06;
 const BASE_FOV = 0.92;
 
 function compile(gl, type, source) {
@@ -109,7 +110,6 @@ function createProgram(gl) {
 
 export function mountVideoSphere(intro) {
   const host = intro.querySelector('#intro-sphere');
-  const hint = intro.querySelector('#intro-hint');
   const unavailable = () => {
     host.removeAttribute('tabindex');
     host.removeAttribute('role');
@@ -209,7 +209,6 @@ export function mountVideoSphere(intro) {
   function showScene() {
     if (destroyed || intro.classList.contains('intro--sphere-ready')) return;
     intro.classList.add('intro--sphere-ready');
-    if (!intro.classList.contains('intro--revealed')) hint.hidden = false;
   }
 
   VIDEO_SOURCES.forEach((source, index) => {
@@ -282,7 +281,7 @@ export function mountVideoSphere(intro) {
       const decay = Math.exp(-4.5 * dt);
       velocityYaw *= decay;
       velocityPitch *= decay;
-      if (time - lastInteractionTime > 1800) yaw += 0.012 * dt;
+      if (time - lastInteractionTime > 1800) yaw += AUTO_ROTATION_RADIANS_PER_SECOND * dt;
     }
     if (Math.abs(yaw) > Math.PI * 2) yaw %= Math.PI * 2;
     const speed = dragging ? Math.hypot(velocityYaw, velocityPitch) : 0;

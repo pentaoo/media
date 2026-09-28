@@ -63,9 +63,6 @@ body.intro-active { overflow: hidden; }
 .intro__sphere video { display: none; }
 .intro--sphere-ready .intro__sphere canvas { opacity: 1; }
 .intro__shade { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: rgba(0,0,0,.56); }
-.intro__hint { position: absolute; z-index: 2; left: var(--intro-inset-start); bottom: var(--intro-inset-block); margin: 0; color: #fff; font-size: clamp(12px, .9vw, 16px); font-weight: 600; letter-spacing: .03em; pointer-events: none; }
-.intro__hint[hidden], .intro--revealed .intro__hint { display: none; }
-.intro__hint span { display: inline-block; margin-left: 12px; font-size: 1.4em; vertical-align: -.08em; }
 .intro__skip { position: absolute; z-index: 2; top: var(--intro-inset-block); right: var(--intro-inset-end); min-height: 44px; }
 .intro__content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; width: 100%; height: 100%; padding: var(--intro-inset-block) var(--intro-inset-end) var(--intro-inset-block) var(--intro-inset-start); pointer-events: none; }
 .intro__headline { width: min(100%, 73.59375vw, 1413px); flex: none; }
