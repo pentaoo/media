@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111111" />
     <title>Pocket Jam — музыка и сцена</title>
+    <link rel="preload" href="./assets/fonts/Benzin-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-page="catalog">
-    <section class="intro" id="intro" aria-label="Вступление Pocket Jam">
+    <section class="intro intro--revealed" id="intro" aria-label="Вступление Pocket Jam">
       <div class="intro__wall" aria-hidden="true">
         <img src="./assets/video/concert.jpg" alt="" />
         <img src="./assets/video/dj.jpg" alt="" />
@@ -19,8 +20,8 @@
       </div>
       <div class="intro__sphere" id="intro-sphere" role="group" tabindex="0" aria-label="Видеосфера: перетаскивайте, чтобы осмотреться. Также работают стрелки на клавиатуре."></div>
       <div class="intro__shade" aria-hidden="true"></div>
-      <button class="text-button text-button--compact intro__skip" id="intro-skip" type="button" aria-controls="intro-content" aria-expanded="false">Показать текст <span aria-hidden="true">↗</span></button>
-      <div class="intro__content" id="intro-content" hidden>
+      <div class="intro__brand-target" id="intro-brand-target" aria-hidden="true"><span>chinatown.ru</span></div>
+      <div class="intro__content" id="intro-content">
         <h1 class="heading-1 intro__headline" id="intro-headline">
           <span class="intro__line"><span class="intro__faded">Скоро на</span></span>
           <span class="intro__line"><span class="intro__link-wrap" id="intro-link-wrap">
@@ -31,9 +32,13 @@
           <span class="intro__line"><span class="intro__faded">о нефорах</span></span>
         </h1>
         <div class="intro__bottom">
-          <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
-          <button class="text-button intro__continue" id="intro-continue" type="button"><span>ОКЕ</span><img src="./assets/icons/navigate-next-sharp.svg" alt="" aria-hidden="true" /></button>
+          <p class="intro__timer">55:55:55:55</p>
+          <div class="intro__actions">
+            <button class="text-button intro__action intro__continue" id="intro-continue" type="button" aria-controls="intro-headline" aria-expanded="true"><span>ОКЕ</span><img src="./assets/icons/intro-navigate-next.svg" alt="" aria-hidden="true" /></button>
+            <a class="text-button intro__action intro__about" id="intro-about" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer" aria-label="О нас — открыть chinatown.ru в новой вкладке" aria-hidden="true" inert><span>О НАС</span><img src="./assets/icons/intro-north-east.svg" alt="" aria-hidden="true" /></a>
+          </div>
         </div>
+        <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
       </div>
     </section>
     <header class="site-header">

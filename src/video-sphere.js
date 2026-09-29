@@ -1,3 +1,5 @@
+import { mountDragHint } from './drag-hint.js';
+
 const VIDEO_SOURCES = [
   { video: new URL('../assets/video/concert.mp4', import.meta.url).href, poster: new URL('../assets/video/concert.jpg', import.meta.url).href },
   { video: new URL('../assets/video/dj.mp4', import.meta.url).href, poster: new URL('../assets/video/dj.jpg', import.meta.url).href },
@@ -140,6 +142,7 @@ export function mountVideoSphere(intro) {
   }
 
   host.append(canvas);
+  const dragHint = mountDragHint(host, intro);
   gl.useProgram(program);
   const position = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, position);
@@ -209,6 +212,7 @@ export function mountVideoSphere(intro) {
   function showScene() {
     if (destroyed || intro.classList.contains('intro--sphere-ready')) return;
     intro.classList.add('intro--sphere-ready');
+    dragHint.reveal();
   }
 
   VIDEO_SOURCES.forEach((source, index) => {
@@ -417,6 +421,7 @@ export function mountVideoSphere(intro) {
     destroyed = true;
     if (frame) cancelAnimationFrame(frame);
     listeners.forEach((remove) => remove());
+    dragHint.destroy();
     videos.forEach((video) => {
       video.pause();
       video.removeAttribute('src');

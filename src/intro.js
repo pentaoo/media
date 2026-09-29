@@ -1,18 +1,19 @@
 import { mountVideoSphere } from './video-sphere.js';
 
-const INTRO_DELAY_MS = 30_000;
 const SITE_URL = 'https://chinatown.ru';
 
 const intro = document.querySelector('#intro');
 const content = document.querySelector('#intro-content');
-const skip = document.querySelector('#intro-skip');
 const continueButton = document.querySelector('#intro-continue');
+const aboutLink = document.querySelector('#intro-about');
+const brandTarget = document.querySelector('#intro-brand-target span');
 const copyStatus = document.querySelector('#intro-copy-status');
 const headline = document.querySelector('#intro-headline');
 const linkWrap = document.querySelector('#intro-link-wrap');
 const siteLink = linkWrap.querySelector('.intro__site-link');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 const headlineParts = [...headline.querySelectorAll('.intro__faded, .intro__site-link')];
+const fadedParts = [...headline.querySelectorAll('.intro__faded')];
 const pageBelow = [document.querySelector('.site-header'), document.querySelector('#app'), document.querySelector('#player')];
 mountVideoSphere(intro);
 let headlineHovered = false;
@@ -20,24 +21,47 @@ let linkFocused = false;
 let pointerStart = null;
 let pointerMoved = false;
 let copyPending = false;
+let compact = false;
+let geometryFrame = 0;
 
 document.body.classList.add('intro-active');
 for (const item of pageBelow) if (item) item.inert = true;
 
-function reveal() {
-  if (!content.hidden) return;
-  content.hidden = false;
-  skip.hidden = true;
-  skip.setAttribute('aria-expanded', 'true');
-  intro.classList.add('intro--revealed');
+// Measure the same link at both sizes so the entire headline can move using
+// only a transform. The hidden target follows the compact Figma text layout.
+function updateCompactGeometry() {
+  geometryFrame = 0;
+  const style = getComputedStyle(headline);
+  const matrix = new DOMMatrixReadOnly(style.transform === 'none' ? undefined : style.transform);
+  const headingRect = headline.getBoundingClientRect();
+  const linkRect = siteLink.getBoundingClientRect();
+  const targetRect = brandTarget.getBoundingClientRect();
+  const currentScale = matrix.a || 1;
+  const scale = parseFloat(getComputedStyle(brandTarget).fontSize) / parseFloat(style.fontSize);
+  const originX = headingRect.left - matrix.e;
+  const originY = headingRect.top - matrix.f;
+  const linkX = (linkRect.left - headingRect.left) / currentScale;
+  const linkY = (linkRect.top - headingRect.top) / currentScale;
+  headline.style.setProperty('--intro-headline-scale', scale);
+  headline.style.setProperty('--intro-headline-x', `${targetRect.left - originX - linkX * scale}px`);
+  headline.style.setProperty('--intro-headline-y', `${targetRect.top - originY - linkY * scale}px`);
 }
 
-function dismissText() {
-  window.clearTimeout(timer);
-  content.hidden = true;
-  skip.hidden = false;
-  skip.setAttribute('aria-expanded', 'false');
-  intro.classList.remove('intro--revealed');
+function queueGeometryUpdate() {
+  if (!geometryFrame) geometryFrame = requestAnimationFrame(updateCompactGeometry);
+}
+
+function compactIntro() {
+  if (compact) return;
+  updateCompactGeometry();
+  compact = true;
+  const moveFocus = document.activeElement === continueButton;
+  intro.classList.add('intro--compact', 'intro--transitioning');
+  continueButton.inert = true;
+  continueButton.setAttribute('aria-expanded', 'false');
+  aboutLink.inert = false;
+  aboutLink.removeAttribute('aria-hidden');
+  for (const part of fadedParts) part.setAttribute('aria-hidden', 'true');
   headlineHovered = false;
   linkFocused = false;
   pointerStart = null;
@@ -45,7 +69,16 @@ function dismissText() {
   intro.classList.remove('is-copy-hovered');
   setLinkActive();
   copyStatus.textContent = '';
-  skip.focus({ preventScroll: true });
+
+  const finish = () => {
+    intro.classList.remove('intro--transitioning', 'intro--revealed');
+    if (moveFocus && (document.activeElement === continueButton || document.activeElement === document.body)) {
+      aboutLink.focus({ preventScroll: true });
+    }
+  };
+  const animations = headline.getAnimations();
+  if (animations.length) Promise.all(animations.map((animation) => animation.finished.catch(() => {}))).then(finish);
+  else finish();
 }
 
 function setLinkActive() {
@@ -69,7 +102,7 @@ function updateHeadlineHover(event) {
 }
 
 function isOverText(event) {
-  return headlineParts.some((part) => containsPoint(part.getBoundingClientRect(), event.clientX, event.clientY, 8));
+  return (compact ? [siteLink] : headlineParts).some((part) => containsPoint(part.getBoundingClientRect(), event.clientX, event.clientY, 8));
 }
 
 function clearHover() {
@@ -81,7 +114,7 @@ function clearHover() {
 function copyFromText(event) {
   if (content.hidden || !finePointer.matches || event.detail === 0 || event.button !== 0
     || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-    || event.target.closest('button') || !isOverText(event)) return;
+    || event.target.closest('button, .intro__about') || !isOverText(event)) return;
   event.preventDefault();
   if (!pointerMoved) copySiteUrl();
 }
@@ -99,12 +132,10 @@ async function copySiteUrl() {
   }
 }
 
-const timer = window.setTimeout(reveal, INTRO_DELAY_MS);
-skip.addEventListener('click', () => {
-  window.clearTimeout(timer);
-  reveal();
-});
-continueButton.addEventListener('click', dismissText);
+updateCompactGeometry();
+window.addEventListener('resize', queueGeometryUpdate);
+document.fonts.ready.then(queueGeometryUpdate);
+continueButton.addEventListener('click', compactIntro);
 siteLink.addEventListener('keydown', (event) => {
   if (event.key !== ' ' || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
