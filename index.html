@@ -32,10 +32,10 @@
           <span class="intro__line"><span class="intro__faded">о нефорах</span></span>
         </h1>
         <div class="intro__bottom">
-          <p class="intro__timer">55:55:55:55</p>
+          <p class="intro__timer" id="intro-timer" role="timer" aria-label="До запуска: дни, часы, минуты, секунды" aria-live="off">30:00:00:00</p>
           <div class="intro__actions">
             <button class="text-button intro__action intro__continue" id="intro-continue" type="button" aria-controls="intro-headline" aria-expanded="true"><span>ОКЕ</span><img src="./assets/icons/intro-navigate-next.svg" alt="" aria-hidden="true" /></button>
-            <a class="text-button intro__action intro__about" id="intro-about" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer" aria-label="О нас — открыть chinatown.ru в новой вкладке" aria-hidden="true" inert><span>О НАС</span><img src="./assets/icons/intro-north-east.svg" alt="" aria-hidden="true" /></a>
+            <a class="text-button intro__action intro__about" id="intro-about" href="./about.html" aria-hidden="true" inert><span>О НАС</span><img src="./assets/icons/intro-north-east.svg" alt="" aria-hidden="true" /></a>
           </div>
         </div>
         <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
@@ -65,5 +65,6 @@
 
     <script type="module" src="./src/app.js"></script>
     <script type="module" src="./src/intro.js"></script>
+    <script type="module" src="./src/site-cursor.js"></script>
   </body>
 </html>

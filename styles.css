@@ -274,6 +274,7 @@ body.intro-active { overflow: hidden; }
 /* Native SVG cursors share the hand's scale and white/black treatment. */
 @media (hover: hover) and (pointer: fine) {
   :root {
+    --site-cursor-mode: default;
     --cursor-default: url('./assets/icons/arrow-cursor.svg') 10 4, default;
     --cursor-pointer: url('./assets/icons/pointer-cursor.svg') 29 4, pointer;
     --cursor-text: url('./assets/icons/text-cursor.svg') 32 34, text;
@@ -287,26 +288,38 @@ body.intro-active { overflow: hidden; }
   input[type='button'], input[type='submit'], input[type='reset'],
   input[type='checkbox'], input[type='radio'], select {
     cursor: var(--cursor-pointer);
+    --site-cursor-mode: pointer;
   }
   input:not([type='button'], [type='submit'], [type='reset'], [type='checkbox'], [type='radio']),
   textarea, [contenteditable='true'] {
     cursor: var(--cursor-text);
+    --site-cursor-mode: text;
   }
   button:disabled, input:disabled, select:disabled, textarea:disabled,
   .text-button:disabled, [aria-disabled='true'], .intro__sphere.intro__sphere--unavailable {
     cursor: var(--cursor-default);
+    --site-cursor-mode: default;
   }
 
-  .intro__sphere { cursor: var(--cursor-grab); }
+  .intro__sphere { cursor: var(--cursor-grab); --site-cursor-mode: grab; }
+  .intro.is-copy-hovered,
   .intro.is-copy-hovered .intro__sphere,
-  .intro.is-copy-hovered .intro__site-link {
+  .intro.is-copy-hovered .intro__headline,
+  .intro.is-copy-hovered .intro__headline * {
     cursor: var(--cursor-copy);
+    --site-cursor-mode: copy;
   }
   .intro__sphere.is-dragging,
   .intro.is-copy-hovered .intro__sphere.is-dragging {
     cursor: var(--cursor-grabbing);
+    --site-cursor-mode: grabbing;
   }
+  html.has-site-cursor, html.has-site-cursor * { cursor: none !important; }
 }
+
+.site-cursor { position: fixed; z-index: 2147483647; top: 0; left: 0; width: 0; height: 0; pointer-events: none; user-select: none; }
+.site-cursor__image { position: absolute; display: block; max-width: none; pointer-events: none; }
+.site-cursor__image[hidden] { display: none; }
 
 .intro--sphere-ready .intro__sphere canvas { opacity: 1; }
 .intro__shade { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: rgba(0,0,0,.56); }
@@ -327,6 +340,7 @@ body.intro-active { overflow: hidden; }
 .intro--compact .intro__headline { transform: translate3d(var(--intro-headline-x, 0px), var(--intro-headline-y, -36px), 0) scale(var(--intro-headline-scale, .25)); letter-spacing: 0; }
 .intro__brand-target { position: absolute; top: var(--intro-compact-inset-block); left: var(--intro-inset-start); padding: 20px 0 12px; visibility: hidden; pointer-events: none; font-family: var(--font-display); font-size: var(--intro-compact-font-size); font-weight: 700; line-height: 1; letter-spacing: 0; text-transform: uppercase; white-space: nowrap; }
 .intro__line { display: block; white-space: nowrap; }
+.intro__headline, .intro__action { user-select: none; -webkit-user-select: none; }
 .intro__faded { opacity: 1; transition: opacity .28s ease; }
 .intro__headline.is-link-active .intro__faded { opacity: .4; }
 .intro--compact .intro__headline .intro__faded { opacity: 0; transition: opacity .4s cubic-bezier(.4, 0, .2, 1); }
@@ -346,6 +360,9 @@ body.intro-active { overflow: hidden; }
 .intro--compact .intro__about { transform: translateY(0); opacity: 1; pointer-events: auto; }
 .intro__copy-status { position: absolute; left: var(--intro-inset-start); right: var(--intro-inset-end); bottom: calc(var(--intro-inset-block) + 80px); margin: 0; font-size: clamp(13px, 1vw, 18px); font-weight: 600; }
 
+.landing-placeholder { min-height: 100svh; display: grid; place-items: center; padding: clamp(24px, 3.333333vw, 64px); background: #111; color: #fff; }
+.landing-placeholder main { width: 100%; }
+.landing-placeholder h1 { margin: 0; font-family: var(--font-display); font-size: clamp(28px, 6vw, 112px); font-weight: 700; line-height: 1.125; letter-spacing: .02em; text-align: center; }
 
 
 .sketch-page { min-height: 100vh; background: #111; color: #f4f1ec; }

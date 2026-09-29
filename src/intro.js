@@ -1,4 +1,5 @@
 import { mountVideoSphere } from './video-sphere.js';
+import { createCountdown } from './countdown.js';
 
 const SITE_URL = 'https://chinatown.ru';
 
@@ -8,11 +9,11 @@ const continueButton = document.querySelector('#intro-continue');
 const aboutLink = document.querySelector('#intro-about');
 const brandTarget = document.querySelector('#intro-brand-target span');
 const copyStatus = document.querySelector('#intro-copy-status');
+const timer = document.querySelector('#intro-timer');
 const headline = document.querySelector('#intro-headline');
 const linkWrap = document.querySelector('#intro-link-wrap');
 const siteLink = linkWrap.querySelector('.intro__site-link');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-const headlineParts = [...headline.querySelectorAll('.intro__faded, .intro__site-link')];
 const fadedParts = [...headline.querySelectorAll('.intro__faded')];
 const pageBelow = [document.querySelector('.site-header'), document.querySelector('#app'), document.querySelector('#player')];
 mountVideoSphere(intro);
@@ -23,6 +24,26 @@ let pointerMoved = false;
 let copyPending = false;
 let compact = false;
 let geometryFrame = 0;
+const countdown = createCountdown();
+let timerInterval = 0;
+
+function renderCountdown() {
+  const { remainingMs, text } = countdown.read();
+  timer.textContent = text;
+  if (!remainingMs) window.clearInterval(timerInterval);
+}
+
+function startCountdown() {
+  window.clearInterval(timerInterval);
+  countdown.reset();
+  renderCountdown();
+  timerInterval = window.setInterval(renderCountdown, 1000);
+}
+
+startCountdown();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderCountdown(); });
+window.addEventListener('pagehide', () => window.clearInterval(timerInterval));
+window.addEventListener('pageshow', (event) => { if (event.persisted) startCountdown(); });
 
 document.body.classList.add('intro-active');
 for (const item of pageBelow) if (item) item.inert = true;
@@ -97,12 +118,13 @@ function updateHeadlineHover(event) {
   }
   const overText = isOverText(event);
   headlineHovered = overText;
-  intro.classList.toggle('is-copy-hovered', finePointer.matches && overText && !pointerStart);
+  intro.classList.toggle('is-copy-hovered', finePointer.matches && overText && !intro.querySelector('.is-dragging'));
   setLinkActive();
 }
 
 function isOverText(event) {
-  return (compact ? [siteLink] : headlineParts).some((part) => containsPoint(part.getBoundingClientRect(), event.clientX, event.clientY, 8));
+  if (event.target.closest('button, .intro__about')) return false;
+  return containsPoint((compact ? siteLink : headline).getBoundingClientRect(), event.clientX, event.clientY);
 }
 
 function clearHover() {
@@ -126,7 +148,7 @@ async function copySiteUrl() {
     await navigator.clipboard.writeText(SITE_URL);
     copyStatus.textContent = 'Ссылка скопирована';
   } catch {
-    copyStatus.textContent = 'Не удалось скопировать. Выделите адрес ссылки вручную.';
+    copyStatus.textContent = 'Не удалось скопировать ссылку.';
   } finally {
     copyPending = false;
   }
@@ -146,7 +168,7 @@ intro.addEventListener('pointerdown', (event) => {
   if (event.button !== 0 || event.pointerType === 'touch') return;
   pointerStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
   pointerMoved = false;
-  intro.classList.remove('is-copy-hovered');
+  updateHeadlineHover(event);
 });
 intro.addEventListener('pointerup', (event) => {
   if (event.pointerId !== pointerStart?.id) return;
@@ -156,6 +178,7 @@ intro.addEventListener('pointerup', (event) => {
 intro.addEventListener('pointercancel', () => { pointerStart = null; pointerMoved = true; clearHover(); });
 intro.addEventListener('pointerleave', clearHover);
 intro.addEventListener('click', copyFromText);
+intro.addEventListener('dragstart', (event) => event.preventDefault());
 finePointer.addEventListener('change', clearHover);
 window.addEventListener('blur', () => { pointerStart = null; clearHover(); });
 linkWrap.addEventListener('focusin', () => {
