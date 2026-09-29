@@ -1,7 +1,7 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const FAMILIES = ['Elion Italic', 'East Gates', 'Sigma Boy'];
 const IDLE_MS = 3000;
-const PULSE_MS = 160;
+const PULSE_MS = 200;
 const MAX_ACTIVE = 3;
 
 // The source stays in Benzin. Plain inline spans preserve the shaped text run;
@@ -21,6 +21,8 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
   let suspended = false;
   let idleTimer = 0;
   let ambientTimer = 0;
+  let hoverTimer = 0;
+  let hoveredLetter = null;
   let measureFrame = 0;
   let inputFrame = 0;
   let lastPulse = -Infinity;
@@ -47,6 +49,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
   }
 
   function stop() {
+    stopHover(false);
     restore();
     clearTimeout(ambientTimer);
     ambientTimer = 0;
@@ -54,6 +57,17 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
     inputFrame = 0;
     pendingInput = null;
     previousPointer = null;
+  }
+
+  function stopHover(hold = true) {
+    const wasHovering = Boolean(hoverTimer);
+    clearInterval(hoverTimer);
+    hoverTimer = 0;
+    hoveredLetter = null;
+    if (hold && wasHovering && active.size) {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(restore, IDLE_MS);
+    }
   }
 
   function font(size, family, weight = 400) {
@@ -103,6 +117,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
         });
       }
     }
+    updateHover();
   }
 
   function queueMeasure() {
@@ -120,7 +135,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
     });
   }
 
-  function replace(candidates, limit, duration = IDLE_MS) {
+  function replace(candidates, limit, duration = IDLE_MS, requiredLetter = null) {
     if (!candidates.length) return;
     // Fisher-Yates over a local pool keeps all three families equally likely.
     const pool = [...candidates];
@@ -130,6 +145,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
       [pool[i], pool[index]] = [pool[index], pool[i]];
       picked.push(pool[i]);
     }
+    if (requiredLetter && !picked.includes(requiredLetter)) picked[0] = requiredLetter;
     for (const letter of active) {
       if (!picked.includes(letter)) {
         letter.source.classList.remove('is-glitched');
@@ -138,7 +154,10 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
       }
     }
     for (const letter of picked) {
-      const variant = letter.variants[Math.floor(Math.random() * letter.variants.length)];
+      const currentFamily = letter.glyph.getAttribute('font-family');
+      const alternatives = letter.variants.filter((variant) => variant.family !== currentFamily);
+      const variants = alternatives.length ? alternatives : letter.variants;
+      const variant = variants[Math.floor(Math.random() * variants.length)];
       letter.glyph.setAttribute('font-family', variant.family);
       letter.glyph.setAttribute('font-size', variant.size);
       letter.glyph.setAttribute('x', variant.x);
@@ -165,7 +184,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
     const now = performance.now();
     if (now - lastPulse < PULSE_MS) return;
     lastPulse = now;
-    replace(candidates, compact ? 1 : Math.min(MAX_ACTIVE, 2 + Math.floor(Math.random() * 2)));
+    replace(candidates, compact ? 1 : Math.min(MAX_ACTIVE, 2 + Math.floor(Math.random() * 2)), IDLE_MS, hoveredLetter);
   }
 
   function queueInput(point) {
@@ -174,18 +193,50 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
     if (!inputFrame) inputFrame = requestAnimationFrame(renderInput);
   }
 
+  function letterUnderPointer() {
+    if (!previousPointer || !mouseInput.matches || !canAnimate()) return null;
+    return eligibleLetters(previousPointer).find((letter) => {
+      const rect = letter.source.getBoundingClientRect();
+      return previousPointer.x >= rect.left && previousPointer.x < rect.right
+        && previousPointer.y >= rect.top && previousPointer.y < rect.bottom;
+    }) || null;
+  }
+
+  function pulseHover() {
+    const letter = letterUnderPointer();
+    if (!letter) return stopHover();
+    hoveredLetter = letter;
+    lastPulse = performance.now();
+    replace(eligibleLetters(previousPointer), compact ? 1 : MAX_ACTIVE, IDLE_MS, letter);
+  }
+
+  function updateHover() {
+    const letter = letterUnderPointer();
+    if (!letter) return stopHover();
+    if (letter === hoveredLetter && hoverTimer) return;
+    stopHover(false);
+    hoveredLetter = letter;
+    pulseHover();
+    // A stationary pointer keeps updating its letter; moving inside the same
+    // letter does not restart the timer or postpone the next 200 ms tick.
+    hoverTimer = setInterval(pulseHover, PULSE_MS);
+  }
+
   function pointerMove(event) {
-    if (!mouseInput.matches || event.pointerType !== 'mouse' || event.buttons) return;
-    const point = { x: event.clientX, y: event.clientY };
-    if (previousPointer && Math.hypot(point.x - previousPointer.x, point.y - previousPointer.y) < 3) return;
-    previousPointer = point;
-    queueInput(point);
+    if (!mouseInput.matches || event.pointerType !== 'mouse') return;
+    if (event.buttons) {
+      previousPointer = null;
+      return stopHover();
+    }
+    previousPointer = { x: event.clientX, y: event.clientY };
+    updateHover();
   }
 
   function scrollMove() {
     const position = window.scrollY;
     if (Math.abs(position - previousScroll) < 2) return;
     previousScroll = position;
+    updateHover();
     queueInput(null);
   }
 
@@ -264,6 +315,12 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
 
   const resizeObserver = new ResizeObserver(queueMeasure);
   listen(document, 'pointermove', pointerMove, { passive: true });
+  listen(document, 'pointerdown', () => { previousPointer = null; stopHover(); }, { passive: true });
+  listen(document, 'pointerup', pointerMove, { passive: true });
+  listen(document, 'pointercancel', () => { previousPointer = null; stopHover(); }, { passive: true });
+  listen(document, 'pointerout', (event) => {
+    if (!event.relatedTarget) { previousPointer = null; stopHover(); }
+  }, { passive: true });
   if (scroll) listen(window, 'scroll', scrollMove, { passive: true });
   listen(window, 'resize', queueMeasure);
   listen(window, 'blur', stop);
@@ -274,7 +331,7 @@ export function mountHeadlineGlitch(headline, { scroll = false } = {}) {
     if (document.hidden) stop();
     else scheduleAmbient();
   });
-  listen(mouseInput, 'change', restore);
+  listen(mouseInput, 'change', () => { previousPointer = null; stopHover(false); restore(); });
   listen(reducedMotion, 'change', () => {
     stop();
     if (!reducedMotion.matches) { initialize(); scheduleAmbient(); }
