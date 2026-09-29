@@ -1,5 +1,6 @@
 import { mountVideoSphere } from './video-sphere.js';
 import { createCountdown } from './countdown.js';
+import { mountHeadlineGlitch } from './headline-glitch.js';
 
 const SITE_URL = 'https://chinatown.ru';
 
@@ -15,6 +16,7 @@ const linkWrap = document.querySelector('#intro-link-wrap');
 const siteLink = linkWrap.querySelector('.intro__site-link');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 const fadedParts = [...headline.querySelectorAll('.intro__faded')];
+const headlineGlitch = mountHeadlineGlitch(headline);
 const pageBelow = [document.querySelector('.site-header'), document.querySelector('#app'), document.querySelector('#player')];
 mountVideoSphere(intro);
 let headlineHovered = false;
@@ -74,6 +76,7 @@ function queueGeometryUpdate() {
 
 function compactIntro() {
   if (compact) return;
+  headlineGlitch.setSuspended(true);
   updateCompactGeometry();
   compact = true;
   const moveFocus = document.activeElement === continueButton;
@@ -93,6 +96,8 @@ function compactIntro() {
 
   const finish = () => {
     intro.classList.remove('intro--transitioning', 'intro--revealed');
+    headlineGlitch.setCompact(true);
+    headlineGlitch.setSuspended(false);
     if (moveFocus && (document.activeElement === continueButton || document.activeElement === document.body)) {
       aboutLink.focus({ preventScroll: true });
     }
