@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#111111" />
-    <title>Pocket Jam — музыка и сцена</title>
+    <title>CHINATOWN.RU — медиа о нефорах</title>
     <link rel="preload" href="./assets/fonts/Benzin-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-page="catalog">
-    <section class="intro intro--revealed" id="intro" aria-label="Вступление Pocket Jam">
+    <section class="intro intro--revealed" id="intro" aria-label="CHINATOWN.RU — скоро">
       <div class="intro__wall" aria-hidden="true">
         <img src="./assets/video/concert.jpg" alt="" />
         <img src="./assets/video/dj.jpg" alt="" />
@@ -19,28 +19,50 @@
         <img src="./assets/video/dj.jpg" alt="" />
       </div>
       <div class="intro__sphere" id="intro-sphere" role="group" tabindex="0" aria-label="Видеосфера: перетаскивайте, чтобы осмотреться. Также работают стрелки на клавиатуре."></div>
+      <img class="intro__reference" src="./assets/figma/intro-background.png" alt="" aria-hidden="true" />
       <div class="intro__shade" aria-hidden="true"></div>
-      <div class="intro__brand-target" id="intro-brand-target" aria-hidden="true"><span>chinatown.ru</span></div>
       <div class="intro__content" id="intro-content">
         <h1 class="heading-1 intro__headline" id="intro-headline">
-          <span class="intro__line"><span class="intro__faded">Скоро на</span></span>
-          <span class="intro__line"><span class="intro__link-wrap" id="intro-link-wrap">
-            <a class="intro__site-link" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer" aria-description="Enter — открыть сайт. Пробел — скопировать ссылку." aria-keyshortcuts="Space">chinatown.ru</a>
-          </span></span>
-          <span class="intro__line"><span class="intro__faded">можно будет</span></span>
-          <span class="intro__line"><span class="intro__faded">прочитать</span></span>
-          <span class="intro__line"><span class="intro__faded">о нефорах</span></span>
+          <span class="intro__line">Скоро на</span>
+          <span class="intro__line"><a class="intro__site-link" href="https://chinatown.ru" target="_blank" rel="noopener noreferrer" aria-description="Enter — открыть сайт. Пробел — скопировать ссылку." aria-keyshortcuts="Space">chinatown.ru</a> –</span>
+          <span class="intro__line"><span class="intro__accent">медиа</span> о нефорах</span>
         </h1>
+        <a class="text-button intro__about" id="intro-about" href="./about.html"><span>О НАС</span><img src="./assets/figma/north-east.svg" alt="" aria-hidden="true" /></a>
         <div class="intro__bottom">
-          <p class="intro__timer" id="intro-timer" role="timer" aria-label="До запуска: дни, часы, минуты, секунды" aria-live="off">30:00:00:00</p>
-          <div class="intro__actions">
-            <button class="text-button intro__action intro__continue" id="intro-continue" type="button" aria-controls="intro-headline" aria-expanded="true"><span>ОКЕ</span><img src="./assets/icons/intro-navigate-next.svg" alt="" aria-hidden="true" /></button>
-            <a class="text-button intro__action intro__about" id="intro-about" href="./about.html" aria-hidden="true" inert><span>О НАС</span><img src="./assets/icons/intro-north-east.svg" alt="" aria-hidden="true" /></a>
-          </div>
+          <div class="intro__socials" aria-label="Социальные сети"><span>ТИКТОК</span><a href="https://t.me/chinatownsite" target="_blank" rel="noopener noreferrer">ТГ-КАНАЛ</a></div>
+          <button class="text-button intro__whitelist" id="intro-whitelist" type="button" aria-haspopup="dialog" aria-controls="subscribe-modal"><span>ПОПАСТЬ В ВАЙТ-ЛИСТ</span><img src="./assets/icons/intro-navigate-next.svg" alt="" aria-hidden="true" /></button>
         </div>
         <p class="intro__copy-status" id="intro-copy-status" role="status" aria-live="polite"></p>
       </div>
     </section>
+    <div class="subscribe-modal" id="subscribe-modal" hidden>
+      <div class="subscribe-modal__backdrop" data-close-modal></div>
+      <section class="subscribe-modal__panel" role="dialog" aria-modal="true" aria-labelledby="subscribe-title" aria-describedby="subscribe-description">
+        <div class="subscribe-modal__deco" aria-hidden="true">
+          <span class="subscribe-modal__word subscribe-modal__word--yo"><span>ЙОУ</span></span>
+          <span class="subscribe-modal__word subscribe-modal__word--need"><span>НУЖ</span></span>
+          <span class="subscribe-modal__word subscribe-modal__word--left-na">НА</span>
+          <span class="subscribe-modal__word subscribe-modal__word--bang"><span>!</span></span>
+          <span class="subscribe-modal__word subscribe-modal__word--tee"><span>ТИ</span></span>
+          <span class="subscribe-modal__word subscribe-modal__word--sha"><span>Ш</span></span>
+          <span class="subscribe-modal__word subscribe-modal__word--ka">КА</span>
+          <span class="subscribe-modal__word subscribe-modal__word--question"><span>?</span></span>
+        </div>
+        <div class="subscribe-modal__body">
+          <div>
+            <h2 id="subscribe-title">держим связь</h2>
+            <p id="subscribe-description"><strong>подпишись на нас, чтобы учавствовать в розыгрыше мерча,</strong> а также быть в курсе новостей медиа и тусовок на&nbsp;китай-городе.</p>
+          </div>
+          <form class="subscribe-modal__form" id="subscribe-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+            <label class="visually-hidden" for="subscribe-email">Электропочта</label>
+            <input id="subscribe-email" name="email" type="email" placeholder="ЭЛЕКТРОПОЧТА" autocomplete="email" inputmode="email" aria-describedby="subscribe-status" required />
+            <button class="text-button subscribe-modal__submit" type="submit"><span>ПОДПИСАТЬСЯ</span><img src="./assets/icons/intro-navigate-next.svg" alt="" aria-hidden="true" /></button>
+            <p class="subscribe-modal__status" id="subscribe-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+        <button class="subscribe-modal__close" id="subscribe-close" type="button" aria-label="Закрыть окно"><img src="./assets/figma/clear.svg" alt="" aria-hidden="true" /></button>
+      </section>
+    </div>
     <header class="site-header">
       <a href="./" data-home-link>Pocket Jam</a>
       <nav aria-label="Основная навигация"><a href="./new-sketch.html">Новый набросок ↗</a></nav>
@@ -65,6 +87,7 @@
 
     <script type="module" src="./src/app.js"></script>
     <script type="module" src="./src/intro.js"></script>
+    <script type="module" src="./src/subscribe-modal.js"></script>
     <script type="module" src="./src/site-cursor.js"></script>
   </body>
 </html>
