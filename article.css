@@ -48,7 +48,8 @@
 .is-search-open :is(.story-header__identity, .story-header__controls) { visibility: hidden; }
 /* Open search is one edge-to-edge screen: no gutters, no gap under the field, 2px seams between cards. */
 .is-search-open .story-header__bar, .is-search-animating .story-header__bar { padding-inline: 0; }
-.story-search input { display: block; flex: 1; width: 100%; min-width: 0; height: 32px; padding: 8px 0 0; border: 0; border-radius: 0; background: transparent; color: #fff; font: 700 var(--font-size-search)/var(--line-height-search) var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+/* Inputs clip text to their line: the 32px line in Benzin Input keeps the old baseline and leaves room for Й and @. */
+.story-search input { display: block; flex: 1; width: 100%; min-width: 0; height: auto; padding: 0; border: 0; border-radius: 0; background: transparent; color: #fff; font: 700 var(--font-size-search)/32px var(--font-input); letter-spacing: .02em; text-transform: uppercase; }
 .story-search input::-webkit-search-decoration, .story-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
 .story-search input::placeholder { color: var(--story-search-placeholder); opacity: 1; }
 .story-search input:focus, .story-search input:focus-visible { outline: none; box-shadow: none; }
@@ -364,7 +365,7 @@ html.has-site-cursor .article-image-viewer :is(button, a) { cursor: var(--cursor
   .is-nav-open .story-header__bar { height: 220px; padding-bottom: 16px; }
   .is-nav-open .story-menu { opacity: 1; visibility: visible; pointer-events: auto; }
   .story-search { grid-column: 2; gap: 8px; padding-inline: 8px; }
-  .story-search input { height: 32px; padding: 0; font: 600 var(--font-size-search)/var(--line-height-search) var(--font-body); letter-spacing: .02em; }
+  .story-search input { height: auto; padding: 0; font: 600 var(--font-size-search)/32px var(--font-body); letter-spacing: .02em; }
   .story-search__results { padding: 0; min-height: 0; }
   .story-search__inner { display: block; }
   .story-search__status { margin: 0 0 16px !important; font-size: var(--font-size-caption); line-height: var(--line-height-caption); }

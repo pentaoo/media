@@ -4,14 +4,16 @@
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  height: var(--input-height);
+  /* Height comes from the line, not a fixed height: Chrome clips input text to the font box when the height is set,
+     which cuts the @ tail. Line + padding + borders still add up to --input-height. */
+  height: auto;
   padding: var(--input-padding);
   border: var(--input-border) solid #fff;
   border-radius: 0;
   outline: 0;
   background: transparent;
   color: #fff;
-  font: 700 var(--font-size-button)/var(--line-height-button) var(--font-input);
+  font: 700 var(--font-size-button)/var(--input-line-height) var(--font-input);
   letter-spacing: var(--button-tracking);
   text-transform: uppercase;
 }

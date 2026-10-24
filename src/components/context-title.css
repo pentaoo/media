@@ -1,4 +1,5 @@
-.context-title__viewport { display: block; overflow: hidden; white-space: nowrap; }
+/* The marquee clips sideways only: the extra block padding keeps the Й breve and descenders inside the clip box. */
+.context-title__viewport { display: block; margin-block: -.25em; padding-block: .25em; overflow: hidden; white-space: nowrap; }
 .context-title__track { display: inline-flex; width: max-content; gap: 32px; vertical-align: top; }
 .context-title__text, .context-title__repeat { display: block; flex: none; }
 .context-title__repeat { display: none; user-select: none; }

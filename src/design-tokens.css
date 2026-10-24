@@ -33,7 +33,9 @@
   --button-tracking: .02em;
   --button-hit-extension: 0px;
   --input-height: 64px;
-  --input-padding: 16px 24px;
+  /* The text line fills the field: inputs clip text to their line box, so a tighter line cuts the @ tail and the Й breve. */
+  --input-padding: 0 24px;
+  --input-line-height: 60px;
   --input-border: 2px;
   --font-input: 'Benzin Input', Benzin, sans-serif;
   --page-gutter: 32px;
@@ -88,7 +90,8 @@
     --fab-gap: 24px;
     --fab-sheet-gap: 8px;
     --input-height: 34px;
-    --input-padding: 10px 12px 6px;
+    --input-padding: 4px 12px 0;
+    --input-line-height: 28px;
     --input-border: 1px;
     --font-input: Benzin, sans-serif;
     --page-gutter: 20px;

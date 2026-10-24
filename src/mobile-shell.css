@@ -129,7 +129,7 @@
   .mobile-search-field { display: flex; flex: none; align-items: center; gap: 6px; min-height: 48px; margin: 0; padding: 0 8px; }
   .mobile-search-field > button { position: relative; display: grid; place-items: center; flex: none; width: 32px; height: 44px; padding: 0; background: transparent; }
   .mobile-search-field img { display: block; max-width: none; }
-  .mobile-search-field > input { flex: 1; width: 100%; min-width: 0; height: var(--input-height); padding: 10px 0 6px; border: 0; border-radius: 0; background: transparent; color: #fff; font: 700 var(--font-size-search)/var(--line-height-search) var(--font-input); letter-spacing: .02em; text-transform: uppercase; }
+  .mobile-search-field > input { flex: 1; width: 100%; min-width: 0; height: auto; padding: 4px 0 0; border: 0; border-radius: 0; background: transparent; color: #fff; font: 700 var(--font-size-search)/30px var(--font-input); letter-spacing: .02em; text-transform: uppercase; }
   .mobile-search-field > input::placeholder { color: #777; opacity: 1; }
   .mobile-search-field > input::-webkit-search-cancel-button { -webkit-appearance: none; }
   .mobile-search-results { flex: 1; min-height: 0; margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
