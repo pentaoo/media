@@ -15,7 +15,6 @@ export function mountArticleImages(page, { onOpenChange = () => {} } = {}) {
     <div class="article-image-viewer__surface"><img alt="" draggable="false"></div>
     <div class="article-image-viewer__controls">
       <button class="article-image-viewer__close action-button--secondary" type="button">Закрыть</button>
-      <a class="article-image-viewer__source" target="_blank" rel="noopener noreferrer" hidden></a>
     </div>
   </div>`;
   document.body.append(dialog);
@@ -23,7 +22,6 @@ export function mountArticleImages(page, { onOpenChange = () => {} } = {}) {
   const surface = dialog.querySelector('.article-image-viewer__surface');
   const enlarged = surface.querySelector('img');
   const closeButton = mountActionButton(dialog.querySelector('button'));
-  const source = dialog.querySelector('a');
   let entry = null;
   let animation = null;
   let shade = null;
@@ -100,14 +98,8 @@ export function mountArticleImages(page, { onOpenChange = () => {} } = {}) {
     const width = item.image.naturalWidth || Number(item.image.getAttribute('width')) || 1;
     const height = item.image.naturalHeight || Number(item.image.getAttribute('height')) || 1;
     stage.style.setProperty('--image-ratio', width / height);
-    stage.classList.toggle('has-source', !!item.link);
     enlarged.src = item.image.currentSrc || item.image.src;
     enlarged.alt = item.image.alt;
-    source.hidden = !item.link;
-    if (item.link) {
-      source.href = item.link.href;
-      source.textContent = `${item.link.getAttribute('aria-label') || 'Открыть источник'} ↗`;
-    } else source.removeAttribute('href');
     const root = document.documentElement;
     scrollLock = { y: window.scrollY, overflow: root.style.overflow, paddingRight: root.style.paddingRight };
     const gutter = innerWidth - root.clientWidth;
@@ -162,12 +154,8 @@ export function mountArticleImages(page, { onOpenChange = () => {} } = {}) {
   dialog.addEventListener('cancel', event => { event.preventDefault(); requestClose(); }, options);
   dialog.addEventListener('keydown', event => {
     if (event.key === 'Tab') {
-      const last = source.hidden ? closeButton : source;
-      if (event.shiftKey && document.activeElement === closeButton
-        || !event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        (event.shiftKey ? last : closeButton).focus();
-      }
+      event.preventDefault();
+      closeButton.focus();
       return;
     }
     if (event.key !== 'Escape') return;

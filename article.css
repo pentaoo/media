@@ -212,15 +212,11 @@
 .article-image-viewer[open] { display: grid; }
 .article-image-viewer::backdrop { background: transparent; }
 .article-image-viewer__stage { --image-viewer-space: calc(2 * (var(--space-6) + var(--space-4) + var(--button-height))); position: relative; width: min(82vw, calc((100svh - var(--image-viewer-space)) * var(--image-ratio, 1)), 1100px); aspect-ratio: var(--image-ratio, 1); }
-.article-image-viewer__stage.has-source { --image-viewer-space: calc(2 * (var(--space-6) + var(--space-4) + var(--button-height) + var(--space-1) + var(--space-6))); }
 .article-image-viewer__surface { width: 100%; height: 100%; transform: perspective(1400px) rotateX(var(--image-tilt-x, 0deg)) rotateY(var(--image-tilt-y, 0deg)); transition: transform 220ms ease-out; filter: drop-shadow(0 24px 48px #0005); }
 .article-image-viewer__surface img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .article-image-viewer__controls { position: absolute; top: calc(100% + var(--space-4)); left: 50%; display: flex; flex-direction: column; align-items: center; gap: var(--space-1); width: max-content; max-width: 90vw; transform: translateX(-50%); }
 /* Shared ActionButton, transparent variant (Figma 388:752); the viewer sets placement only. */
 .article-image-viewer__close { width: auto; }
-.article-image-viewer__source { display: block; min-height: 24px; color: #b7b7b7; font: 400 12px/24px var(--font-body); text-align: center; text-decoration: none; }
-.article-image-viewer__source[hidden] { display: none; }
-.article-image-viewer__source:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
 .article-image-viewer :focus-visible:not(.action-button) { outline: 2px solid var(--media-accent); outline-offset: 4px; }
 .has-article-image-viewer .site-cursor { visibility: hidden; }
 html.has-site-cursor .article-image-viewer, html.has-site-cursor .article-image-viewer * { cursor: var(--cursor-default, default) !important; }
