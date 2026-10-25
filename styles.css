@@ -51,7 +51,7 @@ button { font: inherit; cursor: pointer; }
 body.intro-active { overflow: hidden; }
 .intro[hidden], .intro__content[hidden] { display: none; }
 /* A focused control leaving the screen must not scroll the scene with it. */
-.intro { position: fixed; inset: 0; z-index: 100; overflow-x: clip; overflow-y: auto; background: #101010; color: var(--color-on-media); }
+.intro { position: fixed; inset: 0; z-index: 100; overflow: clip; background: #101010; color: var(--color-on-media); }
 .intro__wall { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); overflow: hidden; }
 .intro__wall img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: cover; filter: saturate(.72); }
 /* A vertical swipe stays with the page; a sideways one turns the sphere. */
@@ -399,7 +399,7 @@ p { line-height: var(--line-height-body); }
      Only the size follows the width: the widest line, «медиа о нефорах», is 13.78em in Benzin 800,
      so the heading's width divided by 13.9 keeps it on one line. The one exception to the no-fluid-type
      rule (AGENTS.md). Desktop only: phones use a fixed size, see the 760px block below. */
-  font-size: calc(100cqi / 13.9);
+  font-size: min(calc(100cqi / 13.9), calc((100svh - 320px) / 3));
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
@@ -455,6 +455,12 @@ p { line-height: var(--line-height-body); }
 .intro__socials > a:hover { text-decoration: underline; text-underline-offset: .2em; }
 .intro__socials > a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .intro__whitelist { grid-column: 2 / span 4; width: 100%; pointer-events: auto; }
+/* Short desktop windows and landscape phones: the stub never scrolls, so the gaps shrink before the heading does. */
+@media (min-width: 761px) and (max-height: 560px) {
+  .intro__content { grid-template-rows: auto minmax(8px, 1fr) auto; }
+  .intro__headline { margin: 0; font-size: min(calc(100cqi / 13.9), calc((100svh - 280px) / 3)); }
+  .intro__socials { gap: 0; }
+}
 .intro__copy-status { position: fixed; z-index: 3; top: 0; right: auto; bottom: auto; left: 0; max-width: calc(100vw - 32px); padding: var(--space-2) var(--space-3); border: 1px solid rgba(255, 255, 255, .3); background: #111; color: #fff; font: 700 var(--font-size-caption)/var(--line-height-caption) var(--font-body); opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity .16s ease, transform .16s ease; }
 .intro__copy-status.is-visible { opacity: 1; transform: translateY(0); }
 .intro__copy-status[data-state='success'] { width: 300px; max-width: none; padding: 0; border: 0; background: none; transform: scale(.6) rotate(-12deg); transition: opacity .12s ease, transform .22s cubic-bezier(.3, 1.6, .5, 1); }
@@ -593,6 +599,8 @@ p { line-height: var(--line-height-body); }
      words break mid-word where they must; the heading fills the top of the screen by sheer size (AGENTS.md). */
   .intro__headline { order: 0; flex: none; align-self: stretch; margin: 0 0 var(--space-8); font-size: 64px; line-height: .92; overflow-wrap: anywhere; word-break: break-all; hyphens: none; }
   .intro__line { display: inline; white-space: normal; }
+  /* Short phones: the stub never scrolls, so the heading gives up size to keep every control on screen. */
+  @media (max-height: 666px) { .intro__headline { font-size: min(64px, 8.5svh); } }
   .intro__about { order: 2; align-self: flex-start; margin: var(--space-6) 0 var(--space-8); }
   /* Flush left with ТГ-КАНАЛ / ТИКТОК: same label padding, no left inset. */
   .intro__about > span { padding: 10px 0 6px /* spacing-exception: optical centring of Benzin caps, same as --button-label-padding */; }
