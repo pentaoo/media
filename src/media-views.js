@@ -6,9 +6,8 @@ export { articleView } from './article-view.js';
 
 const landingMenu = [
   { label: 'статьи', href: './article.html', route: true },
-  { label: 'карта артистов' },
-  { label: 'тесты' },
-  { label: 'мерч' },
+  { label: 'заглушка', href: './index.html' },
+  { label: 'о нас', href: './about.html', route: true },
 ];
 
 const directions = [

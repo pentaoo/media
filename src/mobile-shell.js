@@ -58,7 +58,7 @@ export function mountMobileShell(page, { context: withContext = true, onOverlayC
     <section class="mobile-shell__menu-surface" role="dialog" aria-modal="true" aria-label="Меню сайта" inert>
       <button class="mobile-fab mobile-shell__menu-close" type="button" aria-label="Закрыть меню"><span>${img('arrow-down', 32)}</span></button>
       <nav id="mobile-site-menu" aria-label="Навигация Чайнатаун">
-        <a href="./index.html">статьи</a><a href="./index.html">мерч</a><a href="./index.html">тесты</a><a href="./index.html">карта артистов</a>
+        <a href="./article.html">статьи</a><a href="./index.html">заглушка</a><a href="./about.html">о нас</a>
       </nav>
     </section>
     <section class="mobile-shell__search" id="mobile-site-search" role="dialog" aria-modal="true" aria-label="Поиск статей" inert>

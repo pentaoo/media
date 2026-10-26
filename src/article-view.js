@@ -103,10 +103,9 @@ function referencesView() {
 }
 
 const articleMenu = [
-  { label: 'карта артистов', node: '272:118' },
   { label: 'статьи', href: '#article-content', node: '272:120' },
-  { label: 'тесты', node: '272:121' },
-  { label: 'мерч', node: '272:122' },
+  { label: 'заглушка', href: './index.html' },
+  { label: 'о нас', href: './about.html', route: true },
 ];
 
 function menuItemView({ label, href, route, node }) {
