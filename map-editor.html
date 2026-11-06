@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Редактор темы карты · chinatown.site dev</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <link rel="stylesheet" href="/src/styles/pages/map-editor.css" />
+    <script type="module" src="/src/js/pages/map-editor.js"></script>
+  </head>
+  <!-- Страница для разработки: её нет в vite.config.js, поэтому в сборку на GitHub Pages она не попадает. -->
+  <body class="page page--map-editor">
+    <div class="map-editor">
+      <aside class="map-editor__panel" aria-label="Настройки темы">
+        <header class="map-editor__head">
+          <p class="map-editor__kicker">dev · яндекс карты v3</p>
+          <h1 class="map-editor__title">ТЕМА КАРТЫ</h1>
+        </header>
+
+        <fieldset class="map-editor__block">
+          <legend>начать с пресета</legend>
+          <div class="map-editor__presets" data-presets></div>
+        </fieldset>
+
+        <fieldset class="map-editor__block map-editor__row">
+          <legend>общее</legend>
+          <label class="map-editor__check"><input type="checkbox" id="opt-dark" data-opt="dark" /> тёмная основа</label>
+          <label class="map-editor__check"><input type="checkbox" id="opt-3d" data-opt="buildings3d" /> объёмные дома</label>
+          <label class="map-editor__check"><input type="checkbox" id="opt-places" data-opt="places" checked /> тестовые точки</label>
+        </fieldset>
+
+        <div class="map-editor__groups" data-groups></div>
+
+        <fieldset class="map-editor__block">
+          <legend>JSON для customization</legend>
+          <textarea id="json" class="map-editor__json" spellcheck="false" rows="10" aria-describedby="json-status"></textarea>
+          <p id="json-status" class="map-editor__status" aria-live="polite"></p>
+          <div class="map-editor__actions">
+            <button type="button" class="button button--ghost" data-action="copy">СКОПИРОВАТЬ</button>
+            <button type="button" class="button button--ghost" data-action="apply-json">ПРИМЕНИТЬ JSON</button>
+          </div>
+        </fieldset>
+      </aside>
+
+      <main class="map-editor__stage">
+        <div id="map" class="map-editor__map" aria-label="Карта Китай-города"></div>
+        <div class="map-editor__notice" data-notice hidden></div>
+      </main>
+    </div>
+  </body>
+</html>
