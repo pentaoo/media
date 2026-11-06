@@ -1,0 +1,26 @@
+/* Розовая CTA-кнопка: одна на все страницы, не перекрашивается */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-6);
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font: 700 var(--text-s) / 1 var(--font-display);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}

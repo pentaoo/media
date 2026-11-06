@@ -1,0 +1,16 @@
+{
+  "name": "chinatown-site",
+  "private": true,
+  "version": "2.0.0",
+  "description": "chinatown.site — гид и архив Китай-города. Модуль 2: сайт на Vite.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/build-module-1.mjs",
+    "preview": "vite preview",
+    "test": "npm --prefix module-1 test"
+  },
+  "devDependencies": {
+    "vite": "8.3.6"
+  }
+}

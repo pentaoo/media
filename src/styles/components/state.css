@@ -1,0 +1,38 @@
+/* Состояния загрузки, пустого списка и ошибки */
+.state {
+  grid-column: 1 / -1;
+  padding: var(--space-8);
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.state--error {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.state__action {
+  margin-top: var(--space-4);
+}
+
+.skeleton {
+  min-height: 180px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--color-surface), var(--color-line), var(--color-surface));
+  background-size: 200% 100%;
+  animation: skeleton 1.2s linear infinite;
+}
+
+@keyframes skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

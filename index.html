@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>chinatown.site — гид и архив Китай-города</title>
+    <meta name="description" content="Куда пойти на Китай-городе: места, события и атмосфера района. Не только выпить — найти своих." />
+    <link rel="canonical" href="https://hseadc.github.io/Chinatown/" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="chinatown.site" />
+    <meta property="og:title" content="chinatown.site — гид и архив Китай-города" />
+    <meta property="og:description" content="Куда пойти на Китай-городе: места, события и атмосфера района. Не только выпить — найти своих." />
+    <meta property="og:url" content="https://hseadc.github.io/Chinatown/" />
+    <meta property="og:image" content="https://hseadc.github.io/Chinatown/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="chinatown.site — гид и архив Китай-города" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/Benzin-Bold.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <script type="module" src="/src/js/pages/home.js"></script>
+  </head>
+  <body class="page page--index">
+    <a class="skip-link" href="#main">к содержанию</a>
+
+    <header class="site-header">
+      <div class="site-header__inner container">
+        <a class="site-header__logo" href="./" aria-label="chinatown.site — на главную">chinatown.site</a>
+        <nav class="site-nav" aria-label="Основная навигация">
+          <ul class="site-nav__list">
+            <li><a class="site-nav__link" href="./" aria-current="page">главная</a></li>
+            <li><a class="site-nav__link" href="./events.html">мероприятия</a></li>
+            <li><a class="site-nav__link" href="./module-1/">архив медиа</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="site-main">
+      <section class="hero container" aria-labelledby="hero-title">
+        <p class="hero__kicker">гид по Китай-городу</p>
+        <h1 class="hero__title" id="hero-title">КУДА<br />ПОЙТИ</h1>
+        <p class="hero__lead">места, события и атмосфера района — для тех, кто хочет провести время на кг, но не знает, куда и как.</p>
+        <a class="button" href="./events.html">СМОТРЕТЬ СОБЫТИЯ</a>
+      </section>
+
+      <section class="section container" aria-labelledby="upcoming-title">
+        <div class="section__head">
+          <h2 class="section__title" id="upcoming-title">ближайшие события</h2>
+          <a class="section__more" href="./events.html">все события</a>
+        </div>
+        <div class="events-grid" data-events-list data-limit="3" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner container">
+        <p class="site-footer__brand">chinatown.site — гид и архив Китай-города</p>
+        <nav aria-label="Ссылки в подвале">
+          <ul class="site-footer__links">
+            <li><a href="./events.html">мероприятия</a></li>
+            <li><a href="./module-1/">архив модуля 1</a></li>
+            <li><a href="https://t.me/chinatownmedia" rel="noopener" target="_blank">телеграм</a></li>
+          </ul>
+        </nav>
+        <p class="site-footer__team">Лёша, Лиза, Ксюша · <span class="site-footer__year"></span></p>
+      </div>
+    </footer>
+  </body>
+</html>

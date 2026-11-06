@@ -1,0 +1,53 @@
+/* Дизайн-токены. Фирстиль модуля 2 ещё пересобирается — значения временные. */
+@font-face {
+  font-family: 'Benzin';
+  src: url('/fonts/Benzin-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  /* цвет */
+  --color-bg: #0b0b0c;
+  --color-surface: #18181b;
+  --color-line: #2e2e33;
+  --color-text: #f4f4f5;
+  --color-muted: #a1a1aa;
+  --color-accent: #fc5cff;
+  --color-accent-text: #ffffff;
+  --color-error: #ff6b6b;
+
+  /* шрифты */
+  --font-display: 'Benzin', 'Arial Black', sans-serif;
+  --font-text: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* кегли: телефон ≤ 760, десктоп ≥ 761 */
+  --text-s: 0.875rem;
+  --text-m: 1rem;
+  --text-l: 1.25rem;
+  --title-m: 1.75rem;
+  --title-xl: clamp(3.5rem, 14vw, 10rem);
+
+  /* отступы — шкала 4 px */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  --radius: 16px;
+  --container: 1280px;
+  --gutter: var(--space-4);
+}
+
+@media (min-width: 761px) {
+  :root {
+    --text-l: 1.5rem;
+    --title-m: 2.5rem;
+    --gutter: var(--space-8);
+  }
+}

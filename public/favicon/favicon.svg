@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <radialGradient id="fill" cx="15.6" cy="16.4" r="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#fedbff"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.9"/>
+      <feFlood flood-color="#d566ec"/>
+      <feComposite operator="in" in2="SourceAlpha" result="tint"/>
+      <feGaussianBlur in="tint" stdDeviation="0.9" result="halo"/>
+      <feMerge><feMergeNode in="halo"/><feMergeNode in="halo"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#111"/>
+  <path transform="translate(2.6 2.6) scale(0.8)" filter="url(#glow)" fill="url(#fill)" stroke="#d566ec" stroke-width="0.9" stroke-linejoin="round" d="M13.6272 4.46467L12.4725 13.2773L4.67861 16.4556L10.3075 19.1283L1.79198 33.792L17.019 22.2344L27.483 25.485L21.5654 16.0945L33.6171 1.79198L17.9571 11.8326L13.6272 4.46467Z"/>
+</svg>

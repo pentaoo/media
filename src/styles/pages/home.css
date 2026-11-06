@@ -1,0 +1,21 @@
+/* Главная и 404: первый экран */
+.hero {
+  display: grid;
+  gap: var(--space-6);
+  justify-items: start;
+  padding-block: var(--space-12) var(--space-16);
+}
+
+.hero__kicker {
+  color: var(--color-muted);
+}
+
+.hero__title {
+  font: 700 var(--title-xl) / 0.9 var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.hero__lead {
+  max-width: 36ch;
+  font-size: var(--text-l);
+}

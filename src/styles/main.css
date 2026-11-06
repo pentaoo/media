@@ -1,0 +1,9 @@
+/* Точка входа стилей. Порядок важен: токены → база → раскладка → компоненты → страницы. */
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './components/button.css';
+@import './components/event-card.css';
+@import './components/state.css';
+@import './pages/home.css';
+@import './pages/event.css';
