@@ -164,7 +164,8 @@
   overflow: hidden;
 }
 
-.map-editor__map {
+/* селектор усилен: maplibre-gl.css задаёт .maplibregl-map { position: relative } и подключается позже */
+.map-editor__stage > .map-editor__map {
   position: absolute;
   inset: 0;
   background: var(--color-surface);
