@@ -10,17 +10,17 @@ export const GROUPS = [
   { id: 'green', label: 'зелень', hint: 'парки, скверы, дворы с деревьями', tags: ['park', 'vegetation', 'national_park', 'cemetery'], elements: 'geometry', fields: ['color', 'opacity'] },
   { id: 'water', label: 'вода', hint: 'пруды, река', tags: ['water'], elements: 'geometry', fields: ['color'] },
   { id: 'buildings', label: 'здания', hint: 'заливка домов', tags: ['building'], elements: 'geometry.fill', fields: ['color', 'opacity'] },
-  { id: 'buildings-outline', label: 'контур зданий', hint: 'обводка домов', tags: ['building'], elements: 'geometry.outline', fields: ['color', 'opacity'] },
-  { id: 'roads-major', label: 'большие улицы', hint: 'Маросейка, Солянка, бульвары', tags: ['road_1', 'road_2', 'road_3'], elements: 'geometry.fill', fields: ['color', 'scale'] },
-  { id: 'roads-minor', label: 'переулки', hint: 'Хохловский, Подкопаевский, проезды', tags: ['road_4', 'road_5', 'road_6', 'road_7', 'road_minor', 'road_unclassified'], elements: 'geometry.fill', fields: ['color', 'scale'] },
-  { id: 'roads-outline', label: 'обводка улиц', hint: 'край проезжей части', tags: ['road'], elements: 'geometry.outline', fields: ['color', 'opacity'] },
-  { id: 'paths', label: 'пешеходные', hint: 'дорожки, лестницы, переходы', tags: ['path', 'crosswalk'], elements: 'geometry', fields: ['color', 'opacity'] },
-  { id: 'road-labels', label: 'названия улиц', hint: 'текст подписей', tags: ['road'], elements: 'label.text.fill', fields: ['color', 'scale'] },
-  { id: 'label-halo', label: 'обводка подписей', hint: 'ореол вокруг всех текстов', tags: ['road', 'poi', 'admin', 'address', 'transit'], elements: 'label.text.outline', fields: ['color', 'opacity'] },
+  { id: 'buildings-outline', label: 'контур зданий', hint: 'обводка домов', tags: ['building'], elements: 'geometry.outline', fields: ['color', 'opacity'], ml: ['width'] },
+  { id: 'roads-major', label: 'большие улицы', hint: 'Маросейка, Солянка, бульвары', tags: ['road_1', 'road_2', 'road_3'], elements: 'geometry.fill', fields: ['color', 'scale'], ml: ['blur'] },
+  { id: 'roads-minor', label: 'переулки', hint: 'Хохловский, Подкопаевский, проезды', tags: ['road_4', 'road_5', 'road_6', 'road_7', 'road_minor', 'road_unclassified'], elements: 'geometry.fill', fields: ['color', 'scale'], ml: ['blur'] },
+  { id: 'roads-outline', label: 'обводка улиц', hint: 'край проезжей части', tags: ['road'], elements: 'geometry.outline', fields: ['color', 'opacity'], ml: ['blur'] },
+  { id: 'paths', label: 'пешеходные', hint: 'дорожки, лестницы, переходы', tags: ['path', 'crosswalk'], elements: 'geometry', fields: ['color', 'opacity'], ml: ['dash', 'blur'] },
+  { id: 'road-labels', label: 'названия улиц', hint: 'текст подписей', tags: ['road'], elements: 'label.text.fill', fields: ['color', 'scale'], ml: ['spacing', 'caps'] },
+  { id: 'label-halo', label: 'обводка подписей', hint: 'ореол вокруг всех текстов', tags: ['road', 'poi', 'admin', 'address', 'transit'], elements: 'label.text.outline', fields: ['color', 'opacity'], ml: ['width'] },
   { id: 'address', label: 'номера домов', hint: 'адреса на зданиях', tags: ['address'], elements: 'label', fields: ['color'] },
-  { id: 'poi', label: 'заведения Яндекса', hint: 'чужие точки: кафе, магазины', tags: ['poi'], elements: 'label', fields: ['color', 'opacity'] },
+  { id: 'poi', label: 'заведения Яндекса', hint: 'чужие точки: кафе, магазины', tags: ['poi'], elements: 'label', fields: ['color', 'opacity'], ml: ['spacing', 'caps'] },
   { id: 'transit', label: 'метро и транспорт', hint: 'станции, входы, остановки', tags: ['transit'], elements: 'label', fields: ['color'] },
-  { id: 'admin', label: 'районы', hint: 'названия районов и границы', tags: ['admin'], elements: 'label', fields: ['color'] },
+  { id: 'admin', label: 'районы', hint: 'названия районов и границы', tags: ['admin'], elements: 'label', fields: ['color'], ml: ['spacing', 'caps'] },
 ];
 
 const off = { visible: false };
@@ -51,7 +51,7 @@ export const PRESETS = {
       address: { color: '#5d5678' },
       poi: off,
       transit: { color: '#fc5cff' },
-      admin: { color: '#6b6385' },
+      admin: { color: '#6b6385', spacing: 0.2, caps: true },
     },
   },
   riso: {
@@ -73,13 +73,14 @@ export const PRESETS = {
       address: { color: '#3d5bd9' },
       poi: off,
       transit: { color: '#fc5cff' },
-      admin: { color: '#fc5cff' },
+      admin: { color: '#fc5cff', spacing: 0.15, caps: true },
     },
   },
   hill: {
     label: 'В · горка',
     theme: 'light',
     buildings3d: true,
+    render: { pitch: 50, bearing: -20, extrusion: 1.3 },
     groups: {
       land: { color: '#e6ebe3' },
       green: { color: '#a8c991', opacity: 1 },
@@ -100,15 +101,35 @@ export const PRESETS = {
   },
 };
 
+// Настройки рендера MapLibre (Яндекс их не поддерживает)
+export const RENDER_DEFAULTS = {
+  antialias: true, // сглаживание WebGL (MSAA): заметно на 3D-домах и косых краях заливок
+  pixelRatio: 0, // 0 = как у экрана; больше = чётче, меньше = пиксельно
+  fadeDuration: 300, // появление подписей, мс
+  pitch: 0,
+  bearing: 0,
+  extrusion: 1, // множитель высоты 3D-домов
+  lightIntensity: 0.4,
+  lightColor: '#ffffff',
+  lightAzimuth: 210,
+  lightPolar: 30,
+  buildingsMinZoom: 13,
+  addressMinZoom: 17,
+  poiMinZoom: 16,
+};
+
 // Полное состояние: у каждой группы есть все поля, даже если пресет их не задал.
 export function stateFromPreset(id) {
   const preset = PRESETS[id] ?? PRESETS.yandex;
   const groups = {};
   for (const g of GROUPS) {
     const p = preset.groups[g.id];
-    groups[g.id] = { enabled: Boolean(p), visible: p?.visible !== false, color: p?.color ?? '#888888', opacity: p?.opacity ?? 1, scale: p?.scale ?? 1 };
+    groups[g.id] = {
+      enabled: Boolean(p), visible: p?.visible !== false, color: p?.color ?? '#888888', opacity: p?.opacity ?? 1, scale: p?.scale ?? 1,
+      blur: p?.blur ?? 0, width: p?.width ?? 1, dash: p?.dash ?? true, spacing: p?.spacing ?? 0, caps: p?.caps ?? false,
+    };
   }
-  return { preset: id, theme: preset.theme, buildings3d: preset.buildings3d, groups };
+  return { preset: id, theme: preset.theme, buildings3d: preset.buildings3d, groups, render: { ...RENDER_DEFAULTS, ...preset.render } };
 }
 
 // Правила customization из состояния. Группы с enabled: false не трогают карту.

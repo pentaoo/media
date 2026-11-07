@@ -38,6 +38,24 @@
           <label class="map-editor__check"><input type="checkbox" id="opt-places" data-opt="places" checked /> тестовые точки</label>
         </fieldset>
 
+        <fieldset class="map-editor__block map-editor__render" data-render>
+          <legend>рендер и камера · MapLibre</legend>
+          <label class="map-editor__check"><input type="checkbox" id="r-aa" data-r="antialias" /> сглаживание (antialias)</label>
+          <label class="map-editor__field">плотность пикселей <input type="range" id="r-pr" data-r="pixelRatio" min="0" max="3" step="0.25" /> <output data-out="pixelRatio"></output></label>
+          <label class="map-editor__field">появление подписей, мс <input type="range" id="r-fade" data-r="fadeDuration" min="0" max="1500" step="50" /> <output data-out="fadeDuration"></output></label>
+          <label class="map-editor__field">наклон <input type="range" id="r-pitch" data-r="pitch" min="0" max="85" step="1" /> <output data-out="pitch"></output></label>
+          <label class="map-editor__field">поворот <input type="range" id="r-bearing" data-r="bearing" min="-180" max="180" step="1" /> <output data-out="bearing"></output></label>
+          <label class="map-editor__field">высота 3D-домов <input type="range" id="r-ext" data-r="extrusion" min="0.2" max="4" step="0.1" /> <output data-out="extrusion"></output></label>
+          <label class="map-editor__field">свет: сила <input type="range" id="r-li" data-r="lightIntensity" min="0" max="1" step="0.05" /> <output data-out="lightIntensity"></output></label>
+          <label class="map-editor__field">свет: цвет <input type="color" id="r-lc" data-r="lightColor" /></label>
+          <label class="map-editor__field">свет: сторона <input type="range" id="r-la" data-r="lightAzimuth" min="0" max="360" step="5" /> <output data-out="lightAzimuth"></output></label>
+          <label class="map-editor__field">свет: высота <input type="range" id="r-lp" data-r="lightPolar" min="0" max="90" step="5" /> <output data-out="lightPolar"></output></label>
+          <label class="map-editor__field">дома с масштаба <input type="range" id="r-bz" data-r="buildingsMinZoom" min="12" max="17" step="1" /> <output data-out="buildingsMinZoom"></output></label>
+          <label class="map-editor__field">номера домов с <input type="range" id="r-az" data-r="addressMinZoom" min="14" max="19" step="1" /> <output data-out="addressMinZoom"></output></label>
+          <label class="map-editor__field">заведения с <input type="range" id="r-pz" data-r="poiMinZoom" min="13" max="19" step="1" /> <output data-out="poiMinZoom"></output></label>
+          <button type="button" class="map-editor__preset" data-action="reset-render">сбросить рендер</button>
+        </fieldset>
+
         <div class="map-editor__groups" data-groups></div>
 
         <fieldset class="map-editor__block">

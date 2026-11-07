@@ -6,7 +6,7 @@
 import { Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { GROUPS, PRESETS, stateFromPreset, buildCustomization, layerCustomization, parseCustomization } from '../map/theme.js';
+import { GROUPS, PRESETS, RENDER_DEFAULTS, stateFromPreset, buildCustomization, layerCustomization, parseCustomization } from '../map/theme.js';
 import { buildMapLibreStyle, parseMapLibreStyle } from '../map/maplibre-style.js';
 import { loadYandexMaps } from '../map/yandex.js';
 import { PLACES, KG_CENTER, KG_ZOOM } from '../map/places.js';
@@ -43,7 +43,27 @@ const ENGINES = {
     exportJson: () => raw ?? buildMapLibreStyle(state),
     parse: parseMapLibreStyle,
     async mount(container) {
-      const map = new MapLibreMap({ container, style: this.exportJson(), center: KG_CENTER, zoom: KG_ZOOM, attributionControl: { compact: true } });
+      const r = state.render;
+      const map = new MapLibreMap({
+        container,
+        style: this.exportJson(),
+        center: KG_CENTER,
+        zoom: KG_ZOOM,
+        pitch: r.pitch,
+        bearing: r.bearing,
+        maxPitch: 85,
+        fadeDuration: r.fadeDuration,
+        canvasContextAttributes: { antialias: r.antialias },
+        ...(r.pixelRatio ? { pixelRatio: r.pixelRatio } : {}),
+        attributionControl: { compact: true },
+      });
+      // камера, повёрнутая мышью, попадает в панель
+      map.on('moveend', () => {
+        state.render.pitch = Math.round(map.getPitch());
+        state.render.bearing = Math.round(map.getBearing());
+        syncRender();
+        save();
+      });
       map.on('error', (e) => console.warn('MapLibre:', e.error?.message ?? e));
       let markers = [];
       return {
@@ -52,6 +72,8 @@ const ENGINES = {
           markers.forEach((m) => m.remove());
           markers = show ? PLACES.map((p) => new Marker({ element: pinElement(p) }).setLngLat(p.coordinates).addTo(map)) : [];
         },
+        camera: () => map.easeTo({ pitch: state.render.pitch, bearing: state.render.bearing, duration: 300 }),
+        pixelRatio: () => map.setPixelRatio(state.render.pixelRatio || window.devicePixelRatio),
         destroy: () => map.remove(),
       };
     },
@@ -137,9 +159,11 @@ function renderPresets() {
     b.textContent = preset.label;
     b.setAttribute('aria-pressed', String(state.preset === id && !raw));
     b.addEventListener('click', () => {
+      const before = state.render;
       state = { ...stateFromPreset(id), places: state.places, engine: state.engine };
       raw = null;
       renderAll();
+      if (before.pitch !== state.render.pitch || before.bearing !== state.render.bearing) view?.camera?.();
     });
     box.append(b);
   }
@@ -156,6 +180,7 @@ function renderGroups() {
     row.dataset.visible = String(s.visible);
     row.disabled = Boolean(raw);
     const id = `g-${g.id}`;
+    const ml = state.engine === 'maplibre' ? (g.ml ?? []) : [];
     row.innerHTML = `
       <legend class="map-editor__group-head">
         <label class="map-editor__check"><input type="checkbox" id="${id}-on" data-k="enabled" ${s.enabled ? 'checked' : ''} />
@@ -166,6 +191,11 @@ function renderGroups() {
         ${g.fields.includes('color') ? `<label class="map-editor__field">цвет <input type="color" id="${id}-color" data-k="color" value="${s.color}" /></label>` : ''}
         ${g.fields.includes('opacity') ? `<label class="map-editor__field">прозрачность <input type="range" id="${id}-op" data-k="opacity" min="0" max="1" step="0.05" value="${s.opacity}" /></label>` : ''}
         ${g.fields.includes('scale') ? `<label class="map-editor__field">толщина <input type="range" id="${id}-sc" data-k="scale" min="0.5" max="3" step="0.1" value="${s.scale}" /></label>` : ''}
+        ${ml.includes('blur') ? `<label class="map-editor__field">размытие <input type="range" id="${id}-blur" data-k="blur" min="0" max="6" step="0.25" value="${s.blur}" /></label>` : ''}
+        ${ml.includes('width') ? `<label class="map-editor__field">ширина <input type="range" id="${id}-w" data-k="width" min="0" max="4" step="0.1" value="${s.width}" /></label>` : ''}
+        ${ml.includes('dash') ? `<label class="map-editor__check"><input type="checkbox" id="${id}-dash" data-k="dash" ${s.dash ? 'checked' : ''} /> пунктир</label>` : ''}
+        ${ml.includes('spacing') ? `<label class="map-editor__field">разрядка <input type="range" id="${id}-ls" data-k="spacing" min="0" max="0.5" step="0.02" value="${s.spacing}" /></label>` : ''}
+        ${ml.includes('caps') ? `<label class="map-editor__check"><input type="checkbox" id="${id}-caps" data-k="caps" ${s.caps ? 'checked' : ''} /> капс</label>` : ''}
       </div>`;
     row.addEventListener('input', (e) => {
       const k = e.target.dataset.k;
@@ -185,7 +215,52 @@ function renderGroups() {
   }
 }
 
+// ---------- рендер (MapLibre) ----------
+// remount: опция задаётся только при создании карты
+const RENDER_CONTROLS = {
+  antialias: { remount: true },
+  fadeDuration: { remount: true },
+  pixelRatio: { pixel: true },
+  pitch: { camera: true },
+  bearing: { camera: true },
+};
+
+function syncRender() {
+  document.querySelectorAll('[data-r]').forEach((input) => {
+    const v = state.render[input.dataset.r];
+    if (input.type === 'checkbox') input.checked = Boolean(v);
+    else input.value = v;
+    const out = document.querySelector(`[data-out="${input.dataset.r}"]`);
+    if (out) out.textContent = input.dataset.r === 'pixelRatio' && !v ? 'экран' : String(v);
+  });
+  $('[data-render]').hidden = state.engine !== 'maplibre';
+}
+
+document.querySelectorAll('[data-r]').forEach((input) =>
+  input.addEventListener('input', () => {
+    const k = input.dataset.r;
+    state.render[k] = input.type === 'checkbox' ? input.checked : input.type === 'color' ? input.value : Number(input.value);
+    syncRender();
+    save();
+    const c = RENDER_CONTROLS[k] ?? {};
+    if (c.remount) return initMap();
+    if (c.pixel) return view?.pixelRatio?.();
+    if (c.camera) return view?.camera?.();
+    renderJson();
+    applyToMap();
+  }),
+);
+
+$('[data-action="reset-render"]').addEventListener('click', () => {
+  state.render = { ...RENDER_DEFAULTS };
+  syncRender();
+  save();
+  renderJson();
+  initMap();
+});
+
 function renderOptions() {
+  syncRender();
   $('#opt-engine').value = state.engine;
   $('#opt-dark').checked = state.theme === 'dark';
   $('#opt-3d').checked = state.buildings3d;
@@ -270,7 +345,9 @@ function restore() {
     raw = saved.raw ?? null;
     // добавляем группы, которых не было в старом сохранении
     const base = stateFromPreset('yandex');
-    return { ...base, engine: 'maplibre', ...saved.state, groups: { ...base.groups, ...saved.state.groups } };
+    const groups = {};
+    for (const id of Object.keys(base.groups)) groups[id] = { ...base.groups[id], ...saved.state.groups[id] };
+    return { ...base, engine: 'maplibre', ...saved.state, groups, render: { ...RENDER_DEFAULTS, ...saved.state.render } };
   } catch {
     return null;
   }

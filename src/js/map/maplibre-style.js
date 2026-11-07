@@ -2,6 +2,8 @@
 // Данные: бесплатные векторные тайлы OpenFreeMap (схема OpenMapTiles, источник OpenStreetMap), без ключа.
 // Слои собраны с нуля, чтобы каждой группе редактора соответствовали свои слои и ничего лишнего.
 
+import { RENDER_DEFAULTS } from './theme.js';
+
 const TILES = 'https://tiles.openfreemap.org/planet';
 const GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
 const FONT = ['Noto Sans Regular'];
@@ -38,16 +40,19 @@ function resolve(state) {
   for (const [id, color] of Object.entries(base)) {
     const s = state.groups[id];
     out[id] = s?.enabled
-      ? { visible: s.visible, color: s.color, opacity: s.opacity ?? 1, scale: s.scale ?? 1 }
-      : { visible: id !== 'poi', color, opacity: 1, scale: 1 };
+      ? { visible: s.visible, color: s.color, opacity: s.opacity ?? 1, scale: s.scale ?? 1, blur: s.blur ?? 0, width: s.width ?? 1, dash: s.dash ?? true, spacing: s.spacing ?? 0, caps: s.caps ?? false }
+      : { visible: id !== 'poi', color, opacity: 1, scale: 1, blur: 0, width: 1, dash: true, spacing: 0, caps: false };
   }
   return out;
 }
 
 const vis = (g) => ({ visibility: g.visible ? 'visible' : 'none' });
 
+const textCase = (group) => ({ 'text-transform': group.caps ? 'uppercase' : 'none', 'text-letter-spacing': group.spacing });
+
 export function buildMapLibreStyle(state) {
   const g = resolve(state);
+  const r = { ...RENDER_DEFAULTS, ...state.render };
   const layers = [
     { id: 'land', type: 'background', paint: { 'background-color': g.land.color } },
     {
@@ -73,15 +78,15 @@ export function buildMapLibreStyle(state) {
     id, type: 'line', source: 'omt', 'source-layer': 'transportation',
     filter: ['in', ['get', 'class'], ['literal', classes]],
     layout: { ...vis(group), 'line-cap': 'round', 'line-join': 'round' },
-    paint: { 'line-color': group.color, 'line-width': zoomWidth(w12, w18, group.scale), ...extra },
+    paint: { 'line-color': group.color, 'line-width': zoomWidth(w12, w18, group.scale), 'line-blur': group.blur, ...extra },
   });
   const outline = g['roads-outline'];
   layers.push(
-    { ...road('roads-minor-outline', MINOR, 1.2, 14, { ...outline, scale: g['roads-minor'].scale }), paint: { 'line-color': outline.color, 'line-opacity': outline.opacity, 'line-width': zoomWidth(1.2, 14, g['roads-minor'].scale) } },
-    { ...road('roads-major-outline', MAJOR, 3, 26, { ...outline, scale: g['roads-major'].scale }), paint: { 'line-color': outline.color, 'line-opacity': outline.opacity, 'line-width': zoomWidth(3, 26, g['roads-major'].scale) } },
+    { ...road('roads-minor-outline', MINOR, 1.2, 14, { ...outline, scale: g['roads-minor'].scale }), paint: { 'line-color': outline.color, 'line-opacity': outline.opacity, 'line-blur': outline.blur, 'line-width': zoomWidth(1.2, 14, g['roads-minor'].scale) } },
+    { ...road('roads-major-outline', MAJOR, 3, 26, { ...outline, scale: g['roads-major'].scale }), paint: { 'line-color': outline.color, 'line-opacity': outline.opacity, 'line-blur': outline.blur, 'line-width': zoomWidth(3, 26, g['roads-major'].scale) } },
     road('roads-minor', MINOR, 0.6, 11, g['roads-minor']),
     road('roads-major', MAJOR, 2, 22, g['roads-major']),
-    road('paths', PATHS, 0.5, 3, g.paths, { 'line-opacity': g.paths.opacity, 'line-dasharray': [2, 1.5] }),
+    road('paths', PATHS, 0.5, 3, g.paths, { 'line-opacity': g.paths.opacity, ...(g.paths.dash ? { 'line-dasharray': [2, 1.5] } : {}) }),
     {
       id: 'rail', type: 'line', source: 'omt', 'source-layer': 'transportation', filter: ['==', ['get', 'class'], 'rail'],
       layout: vis(g.transit), paint: { 'line-color': g.transit.color, 'line-width': 1, 'line-opacity': 0.6 },
@@ -91,43 +96,43 @@ export function buildMapLibreStyle(state) {
   // здания: плоские или объёмные
   if (state.buildings3d) {
     layers.push({
-      id: 'buildings', type: 'fill-extrusion', source: 'omt', 'source-layer': 'building', minzoom: 14,
+      id: 'buildings', type: 'fill-extrusion', source: 'omt', 'source-layer': 'building', minzoom: r.buildingsMinZoom,
       layout: vis(g.buildings),
       paint: {
         'fill-extrusion-color': g.buildings.color,
-        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 10],
-        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+        'fill-extrusion-height': ['*', ['coalesce', ['get', 'render_height'], 10], r.extrusion],
+        'fill-extrusion-base': ['*', ['coalesce', ['get', 'render_min_height'], 0], r.extrusion],
         'fill-extrusion-opacity': Math.min(g.buildings.opacity, 0.95),
       },
     });
   } else {
     layers.push({
-      id: 'buildings', type: 'fill', source: 'omt', 'source-layer': 'building', minzoom: 13,
+      id: 'buildings', type: 'fill', source: 'omt', 'source-layer': 'building', minzoom: r.buildingsMinZoom,
       layout: vis(g.buildings), paint: { 'fill-color': g.buildings.color, 'fill-opacity': g.buildings.opacity },
     });
     layers.push({
-      id: 'buildings-outline', type: 'line', source: 'omt', 'source-layer': 'building', minzoom: 15,
-      layout: vis(g['buildings-outline']), paint: { 'line-color': g['buildings-outline'].color, 'line-opacity': g['buildings-outline'].opacity, 'line-width': 0.7 },
+      id: 'buildings-outline', type: 'line', source: 'omt', 'source-layer': 'building', minzoom: Math.max(r.buildingsMinZoom, 15),
+      layout: vis(g['buildings-outline']), paint: { 'line-color': g['buildings-outline'].color, 'line-opacity': g['buildings-outline'].opacity, 'line-width': 0.7 * g['buildings-outline'].width },
     });
   }
 
   const halo = g['label-halo'];
-  const haloPaint = { 'text-halo-color': halo.color, 'text-halo-width': halo.visible ? 1.6 * halo.opacity : 0 };
+  const haloPaint = { 'text-halo-color': halo.color, 'text-halo-width': halo.visible ? 1.6 * halo.width * halo.opacity : 0 };
   layers.push(
     {
       id: 'road-labels', type: 'symbol', source: 'omt', 'source-layer': 'transportation_name', minzoom: 14,
-      layout: { ...vis(g['road-labels']), 'symbol-placement': 'line', 'text-field': NAME, 'text-font': FONT, 'text-size': ['interpolate', ['linear'], ['zoom'], 14, 10 * g['road-labels'].scale, 18, 14 * g['road-labels'].scale] },
+      layout: { ...vis(g['road-labels']), 'symbol-placement': 'line', 'text-field': NAME, 'text-font': FONT, 'text-size': ['interpolate', ['linear'], ['zoom'], 14, 10 * g['road-labels'].scale, 18, 14 * g['road-labels'].scale], ...textCase(g['road-labels']) },
       paint: { 'text-color': g['road-labels'].color, ...haloPaint },
     },
     {
-      id: 'address', type: 'symbol', source: 'omt', 'source-layer': 'housenumber', minzoom: 17,
+      id: 'address', type: 'symbol', source: 'omt', 'source-layer': 'housenumber', minzoom: r.addressMinZoom,
       layout: { ...vis(g.address), 'text-field': ['get', 'housenumber'], 'text-font': FONT, 'text-size': 10 },
       paint: { 'text-color': g.address.color, ...haloPaint },
     },
     {
-      id: 'poi', type: 'symbol', source: 'omt', 'source-layer': 'poi', minzoom: 16,
+      id: 'poi', type: 'symbol', source: 'omt', 'source-layer': 'poi', minzoom: r.poiMinZoom,
       filter: ['!', ['in', ['get', 'class'], ['literal', TRANSIT_POI]]],
-      layout: { ...vis(g.poi), 'text-field': NAME, 'text-font': FONT, 'text-size': 11, 'text-max-width': 8 },
+      layout: { ...vis(g.poi), 'text-field': NAME, 'text-font': FONT, 'text-size': 11, 'text-max-width': 8, ...textCase(g.poi) },
       paint: { 'text-color': g.poi.color, 'text-opacity': g.poi.opacity, ...haloPaint },
     },
     {
@@ -139,7 +144,7 @@ export function buildMapLibreStyle(state) {
     {
       id: 'admin', type: 'symbol', source: 'omt', 'source-layer': 'place',
       filter: ['in', ['get', 'class'], ['literal', ['suburb', 'quarter', 'neighbourhood']]],
-      layout: { ...vis(g.admin), 'text-field': NAME, 'text-font': FONT_BOLD, 'text-size': 13, 'text-transform': 'uppercase', 'text-letter-spacing': 0.08 },
+      layout: { ...vis(g.admin), 'text-field': NAME, 'text-font': FONT_BOLD, 'text-size': 13, ...textCase(g.admin) },
       paint: { 'text-color': g.admin.color, ...haloPaint },
     },
   );
@@ -149,6 +154,7 @@ export function buildMapLibreStyle(state) {
     name: `chinatown.site · ${state.preset ?? 'своя тема'}`,
     sources: { omt: { type: 'vector', url: TILES, attribution: '© OpenStreetMap contributors · OpenFreeMap' } },
     glyphs: GLYPHS,
+    light: { anchor: 'map', color: r.lightColor, intensity: r.lightIntensity, position: [1.15, r.lightAzimuth, r.lightPolar] },
     layers,
   };
 }

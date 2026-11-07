@@ -180,6 +180,11 @@
   text-align: center;
 }
 
+.map-editor__notice[hidden],
+.map-editor__render[hidden] {
+  display: none;
+}
+
 .map-editor__notice p {
   margin: 0;
   max-width: 44ch;
@@ -206,6 +211,17 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
+}
+
+.map-editor__render .map-editor__field {
+  justify-content: space-between;
+}
+
+.map-editor__render output {
+  min-width: 3.5ch;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 /* тестовые метки */
