@@ -16,7 +16,7 @@
     <div class="map-editor">
       <aside class="map-editor__panel" aria-label="Настройки темы">
         <header class="map-editor__head">
-          <p class="map-editor__kicker">dev · яндекс карты v3</p>
+          <p class="map-editor__kicker">dev · maplibre и яндекс карты</p>
           <h1 class="map-editor__title">ТЕМА КАРТЫ</h1>
         </header>
 
@@ -27,6 +27,12 @@
 
         <fieldset class="map-editor__block map-editor__row">
           <legend>общее</legend>
+          <label class="map-editor__field map-editor__engine">карта
+            <select id="opt-engine">
+              <option value="maplibre">MapLibre · OpenStreetMap, без ключа</option>
+              <option value="yandex">Яндекс Карты · нужен ключ</option>
+            </select>
+          </label>
           <label class="map-editor__check"><input type="checkbox" id="opt-dark" data-opt="dark" /> тёмная основа</label>
           <label class="map-editor__check"><input type="checkbox" id="opt-3d" data-opt="buildings3d" /> объёмные дома</label>
           <label class="map-editor__check"><input type="checkbox" id="opt-places" data-opt="places" checked /> тестовые точки</label>

@@ -1,10 +1,17 @@
 // Редактор темы карты (только для разработки).
-// Слева настройки по группам объектов, справа живая карта Яндекса,
-// внизу панели JSON, который можно скопировать в код карты на сайте.
+// Слева настройки по группам объектов, справа живая карта, внизу панели JSON,
+// который можно скопировать в код карты на сайте.
+// Два движка: MapLibre с бесплатными тайлами OpenFreeMap (без ключа) и Яндекс Карты v3 (нужен ключ).
 
+import { Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { GROUPS, PRESETS, stateFromPreset, buildCustomization, layerCustomization, parseCustomization } from '../map/theme.js';
+import { buildMapLibreStyle, parseMapLibreStyle } from '../map/maplibre-style.js';
 import { loadYandexMaps } from '../map/yandex.js';
 import { PLACES, KG_CENTER, KG_ZOOM } from '../map/places.js';
+
+setWorkerUrl(maplibreWorkerUrl);
 
 const STORAGE_KEY = 'kg-map-theme-editor';
 
@@ -13,63 +20,109 @@ const json = $('#json');
 const status = $('#json-status');
 const notice = $('[data-notice]');
 
-let rawRules = null; // правила, вставленные вручную; пока они есть, группы не используются
-let state = restore() ?? { ...stateFromPreset('night'), places: true };
+let raw = null; // JSON, вставленный вручную; пока он есть, настройки по группам не используются
+let state = restore() ?? { ...stateFromPreset('night'), places: true, engine: 'maplibre' };
+
+function pinElement(place) {
+  const wrap = document.createElement('div');
+  wrap.className = 'kg-pin-anchor';
+  const el = document.createElement('div');
+  el.className = 'kg-pin';
+  el.style.setProperty('--pin', place.color);
+  el.title = place.mood;
+  el.innerHTML = '<span class="kg-pin__dot"></span><span class="kg-pin__label"></span>';
+  el.querySelector('.kg-pin__label').textContent = place.name;
+  wrap.append(el);
+  return wrap;
+}
+
+// ---------- движки ----------
+const ENGINES = {
+  maplibre: {
+    label: 'MapLibre · без ключа',
+    exportJson: () => raw ?? buildMapLibreStyle(state),
+    parse: parseMapLibreStyle,
+    async mount(container) {
+      const map = new MapLibreMap({ container, style: this.exportJson(), center: KG_CENTER, zoom: KG_ZOOM, attributionControl: { compact: true } });
+      map.on('error', (e) => console.warn('MapLibre:', e.error?.message ?? e));
+      let markers = [];
+      return {
+        apply: () => map.setStyle(this.exportJson()),
+        markers(show) {
+          markers.forEach((m) => m.remove());
+          markers = show ? PLACES.map((p) => new Marker({ element: pinElement(p) }).setLngLat(p.coordinates).addTo(map)) : [];
+        },
+        destroy: () => map.remove(),
+      };
+    },
+  },
+  yandex: {
+    label: 'Яндекс · нужен ключ',
+    exportJson: () => (raw ? layerCustomization(state, raw) : layerCustomization(state, buildCustomization(state))),
+    parse(text) {
+      const parsed = parseCustomization(text);
+      state.buildings3d = parsed.buildings3d;
+      return parsed.rules;
+    },
+    async mount(container) {
+      const api = await loadYandexMaps();
+      const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker } = api;
+      const map = new YMap(container, { location: { center: KG_CENTER, zoom: KG_ZOOM }, theme: state.theme });
+      const scheme = new YMapDefaultSchemeLayer({ customization: this.exportJson() });
+      map.addChild(scheme);
+      map.addChild(new YMapDefaultFeaturesLayer({}));
+      let markers = [];
+      return {
+        apply: () => {
+          map.update({ theme: state.theme });
+          scheme.update({ customization: this.exportJson() });
+        },
+        markers(show) {
+          markers.forEach((m) => map.removeChild(m));
+          markers = show ? PLACES.map((p) => new YMapMarker({ coordinates: p.coordinates }, pinElement(p))) : [];
+          markers.forEach((m) => map.addChild(m));
+        },
+        destroy: () => map.destroy?.(),
+      };
+    },
+  },
+};
+
+const engine = () => ENGINES[state.engine] ?? ENGINES.maplibre;
 
 // ---------- карта ----------
-let map;
-let scheme;
-let markers = [];
-let api;
+let view = null;
+let mounting = 0;
 
 async function initMap() {
+  const ticket = ++mounting;
+  view?.destroy();
+  view = null;
+  notice.hidden = true;
+  const container = $('#map');
+  container.replaceChildren();
   try {
-    api = await loadYandexMaps();
+    const v = await engine().mount(container);
+    if (ticket !== mounting) return v.destroy();
+    view = v;
+    view.markers(state.places);
   } catch (error) {
-    showNotice(error.message);
-    return;
+    if (ticket === mounting) showNotice(error.message);
   }
-  const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer } = api;
-  map = new YMap($('#map'), { location: { center: KG_CENTER, zoom: KG_ZOOM }, theme: state.theme });
-  scheme = new YMapDefaultSchemeLayer({ customization: currentCustomization() });
-  map.addChild(scheme);
-  map.addChild(new YMapDefaultFeaturesLayer({}));
-  renderMarkers();
 }
 
 function renderMarkers() {
-  if (!map) return;
-  markers.forEach((m) => map.removeChild(m));
-  markers = [];
-  if (!state.places) return;
-  for (const place of PLACES) {
-    const el = document.createElement('div');
-    el.className = 'kg-pin';
-    el.style.setProperty('--pin', place.color);
-    el.innerHTML = `<span class="kg-pin__dot"></span><span class="kg-pin__label"></span>`;
-    el.querySelector('.kg-pin__label').textContent = place.name;
-    el.title = place.mood;
-    const marker = new api.YMapMarker({ coordinates: place.coordinates }, el);
-    map.addChild(marker);
-    markers.push(marker);
-  }
-}
-
-function currentCustomization() {
-  const rules = rawRules ?? buildCustomization(state);
-  return layerCustomization(state, rules);
+  view?.markers(state.places);
 }
 
 function applyToMap() {
-  if (!map) return;
-  map.update({ theme: state.theme });
-  scheme.update({ customization: currentCustomization() });
+  view?.apply();
 }
 
 function showNotice(text) {
   notice.hidden = false;
   notice.innerHTML = `<p class="map-editor__notice-title">КАРТА НЕ ЗАГРУЗИЛАСЬ</p><p></p>
-    <p class="map-editor__notice-hint">Редактор и JSON работают и без карты.</p>`;
+    <p class="map-editor__notice-hint">Редактор и JSON работают и без карты. Можно переключиться на MapLibre: он без ключа.</p>`;
   notice.querySelectorAll('p')[1].textContent = text;
 }
 
@@ -82,10 +135,10 @@ function renderPresets() {
     b.type = 'button';
     b.className = 'map-editor__preset';
     b.textContent = preset.label;
-    b.setAttribute('aria-pressed', String(state.preset === id && !rawRules));
+    b.setAttribute('aria-pressed', String(state.preset === id && !raw));
     b.addEventListener('click', () => {
-      state = { ...stateFromPreset(id), places: state.places };
-      rawRules = null;
+      state = { ...stateFromPreset(id), places: state.places, engine: state.engine };
+      raw = null;
       renderAll();
     });
     box.append(b);
@@ -101,7 +154,7 @@ function renderGroups() {
     row.className = 'map-editor__group';
     row.dataset.enabled = String(s.enabled);
     row.dataset.visible = String(s.visible);
-    row.disabled = Boolean(rawRules);
+    row.disabled = Boolean(raw);
     const id = `g-${g.id}`;
     row.innerHTML = `
       <legend class="map-editor__group-head">
@@ -133,16 +186,19 @@ function renderGroups() {
 }
 
 function renderOptions() {
+  $('#opt-engine').value = state.engine;
   $('#opt-dark').checked = state.theme === 'dark';
   $('#opt-3d').checked = state.buildings3d;
   $('#opt-places').checked = state.places;
 }
 
 function renderJson() {
-  json.value = JSON.stringify(currentCustomization(), null, 2);
-  status.textContent = rawRules
+  json.value = JSON.stringify(engine().exportJson(), null, 2);
+  status.textContent = raw
     ? 'Сейчас действует вставленный JSON. Выбери пресет, чтобы вернуться к настройкам по группам.'
-    : `${buildCustomization(state).length} правил`;
+    : state.engine === 'yandex'
+      ? `${buildCustomization(state).length} правил для customization`
+      : 'Стиль MapLibre целиком: его можно открыть в Maputnik';
 }
 
 function renderAll() {
@@ -190,9 +246,7 @@ $('[data-action="copy"]').addEventListener('click', async () => {
 
 $('[data-action="apply-json"]').addEventListener('click', () => {
   try {
-    const parsed = parseCustomization(json.value);
-    rawRules = parsed.rules;
-    state.buildings3d = parsed.buildings3d;
+    raw = engine().parse(json.value);
     state.preset = null;
     renderAll();
   } catch (error) {
@@ -203,7 +257,7 @@ $('[data-action="apply-json"]').addEventListener('click', () => {
 // ---------- хранение ----------
 function save() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, rawRules }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, raw }));
   } catch {
     /* хранилище недоступно — просто не запоминаем */
   }
@@ -213,14 +267,21 @@ function restore() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!saved?.state?.groups) return null;
-    rawRules = saved.rawRules ?? null;
+    raw = saved.raw ?? null;
     // добавляем группы, которых не было в старом сохранении
     const base = stateFromPreset('yandex');
-    return { ...base, ...saved.state, groups: { ...base.groups, ...saved.state.groups } };
+    return { ...base, engine: 'maplibre', ...saved.state, groups: { ...base.groups, ...saved.state.groups } };
   } catch {
     return null;
   }
 }
+
+$('#opt-engine').addEventListener('change', (e) => {
+  state.engine = e.target.value;
+  raw = null;
+  renderAll();
+  initMap();
+});
 
 renderAll();
 initMap();
